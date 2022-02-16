@@ -45,12 +45,11 @@ namespace BulletHell3D
         {
             updatable.bullets.Clear();
             if(manager == null)
-            {
                 manager = BHManager.instance;
-                if(manager == null)
-                    BHExceptionRaiser.RaiseException(BHException.ManagerNotFound);
-            }
-            manager.RemoveUpdatable(updatable);
+            //If manager REALLY is null, that almost certainly means the scene get destroyed.
+            //It really doesn't matter if the updatable actually get removed or not in this case.
+            if(manager != null)
+                manager.RemoveUpdatable(updatable);
         }
 
         public static void DefaultRemoveBullets(IBHUpdatable updatable)
