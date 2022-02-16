@@ -1,0 +1,32 @@
+Returnal-like Bullet Hell Framework
+/********************/
+[Goal (In comparison with previous 2D bullet hell framework)]
+
+1. In 3D. (Obviously)
+
+2. Less gungeon-like architecture. 
+//Gungeon-like bullet hell supports multi-layer transform parenting.
+//While in Returnal, most patterns are formed by single level parenting.
+
+3. Dynamic bullet movement.
+//In previous bullet hell framework, most bullets movement are pre-defined.
+//That is, after a bullet fires, its movement is completely indepentant and deterministic.
+//In Returnal however, bullets have dynamic behaviour (For example: tracking player)
+
+4. Support "Actual" collision.
+//In previous bullet hell framework, we assumed that there is no obstacles. (walls, debris ... etc) The only thing the bullets might hit is the player. (Or overbound)
+//In Returnal, bullets collide with physic objects.
+
+/********************/
+[Problems]
+
+1. Position Update
+    Matrix4x4
+    Pre-defined movement v.s. Attach bullets to an actual gameobjects (And modify gameobjects during runtime)
+
+2. Collision Detection
+    Unity Raycast (Multi-thread?)
+    [Nope] Custom Raycast (Nope, performance sucks with unknown reasons)
+
+3. Rendering
+    [Solved (kinda?)] Graphics.DrawMeshInstanced
