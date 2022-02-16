@@ -15,7 +15,7 @@ public class TestBHTransformSpawner : MonoBehaviour
 
     private void Start() 
     {
-        InvokeRepeating("Shoot", 0, 0.4f);    
+        InvokeRepeating("Shoot", 0, 0.75f);    
     }
 
     void Shoot()
