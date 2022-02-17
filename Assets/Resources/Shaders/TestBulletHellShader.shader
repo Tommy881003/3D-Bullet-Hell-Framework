@@ -3,8 +3,6 @@
     Properties
     {
         [Gamma][HDR]_Color ("Color", Color) = (1,1,1,1)
-        _Freq ("Frequency", float) = 1
-        _Amp ("Amplitude", float) = 1
     }
     SubShader
     {
@@ -42,14 +40,6 @@
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
-            float _Freq;
-            float _Amp;
-
-            float random(float2 uv)
-            {
-                return frac(sin(dot(uv,float2(12.9898,78.233)))*43758.5453123);
-            }
-
             v2f vert (appdata v)
             {
                 v2f o;
@@ -57,7 +47,7 @@
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_TRANSFER_INSTANCE_ID(v, o);
 
-                fixed4 verx = v.vertex + fixed4(v.normal.x, v.normal.y, v.normal.z, 0) * (sin((_Time.y + random(v.vertex.xy)) * 6.28f * _Freq) - 1) * _Amp;
+                fixed4 verx = v.vertex;
 
                 o.vertex = UnityObjectToClipPos(verx);
                 o.worldPos = mul(unity_ObjectToWorld, verx);

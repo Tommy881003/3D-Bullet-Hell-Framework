@@ -15,21 +15,19 @@ namespace BulletHell3D
         [SerializeField]
         protected BHPattern mainPattern;
 
-        //Orthonormal vectors in relative coordinate.
-        //Forward: z-axis
-        //Right: x-axis
-        //Up: y-axis
-        protected Vector3 relativeForward;
-        protected Vector3 relativeRight;
-        protected Vector3 relativeUp;
-        protected float angleInDeg;
-
         public void Init(Vector3 position, Vector3 forwardAxis, float angleInDeg)
         {
             InitUpdatable();
+
+            // Orthonormal vectors in relative coordinate.
+            // Forward: z-axis
+            // Right: x-axis
+            // Up: y-axis
+            Vector3 relativeForward;
+            Vector3 relativeRight;
+            Vector3 relativeUp;
             
             relativeForward = forwardAxis.normalized;
-            this.angleInDeg = angleInDeg;
             BHHelper.LookRotationSolver(forwardAxis, angleInDeg, out relativeUp, out relativeRight);
 
             transform.position = position;

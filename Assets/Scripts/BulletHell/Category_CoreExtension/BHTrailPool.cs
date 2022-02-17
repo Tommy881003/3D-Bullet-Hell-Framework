@@ -12,6 +12,12 @@ namespace BulletHell3D
         private const int maxTrailCount = 1000;
         private Queue<TrailRenderer> trQueue = new Queue<TrailRenderer>();
 
+        // This gameobject needs a trail renderer attached to it.
+        [SerializeField]
+        private GameObject trPreset;
+
+        public int stockCount { get { return trQueue.Count; } }
+
         void Awake() 
         {
             if(_instance == null)
@@ -28,9 +34,9 @@ namespace BulletHell3D
         {
             for(int i = 0; i < maxTrailCount; i++)
             {
-                GameObject go = new GameObject("Trail");
+                GameObject go = Instantiate(trPreset);
                 go.transform.SetParent(transform);
-                trQueue.Enqueue(go.AddComponent<TrailRenderer>());
+                trQueue.Enqueue(go.GetComponent<TrailRenderer>());
                 go.SetActive(false);
             }
         }

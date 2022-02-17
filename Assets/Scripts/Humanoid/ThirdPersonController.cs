@@ -133,6 +133,8 @@ public class ThirdPersonController : MonoBehaviour
             rawDirection += Vector3.left;
         if(Input.GetKey(KeyCode.D))
             rawDirection += Vector3.right;
+
+        //Debug.Log(rawDirection);
         
         if(rawDirection == Vector3.zero)
             horizontalSpeed = Mathf.Max(horizontalSpeed - acclerationStrenth * Time.deltaTime, 0);

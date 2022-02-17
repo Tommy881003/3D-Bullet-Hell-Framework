@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b43dd2e0262a46c42af6aecb9d584d90, type: 3}
-  m_Name: BHRenderObject_B
+  m_Name: BaseBullet_A
   m_EditorClassIdentifier: 
   _mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  _material: {fileID: 2100000, guid: 68c8e2cd222afb84e988b1e30e56b8e4, type: 2}
+  _material: {fileID: 2100000, guid: f8f424f29dd116c4a93030d553aca616, type: 2}
   _radius: 0.45
