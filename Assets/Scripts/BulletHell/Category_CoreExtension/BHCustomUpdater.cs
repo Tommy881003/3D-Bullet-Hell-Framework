@@ -4,22 +4,22 @@ using UnityEngine;
 
 namespace BulletHell3D
 {
-    // Memo: Behaviour of BHTransformUpdater
+    // Memo: Behaviour of BHCustomUpdater
     // 1. Can add bullets as long as it's not destroy.
     // 2. Does not auto-destroy (even when it has no bullets), must call Destroy manually.
-    public class BHSimpleUpdater : MonoBehaviour, IBHUpdatable
+    public class BHCustomUpdater : MonoBehaviour, IBHBulletUpdater
     {
         public List<BHBullet> bullets { get; protected set; } = new List<BHBullet>();
         protected List<Vector3> fowards = new List<Vector3>();
 
         public void Awake()
         {
-            InitUpdatable();
+            InitUpdater();
         }
 
-        #region IBHUpdatable Implementation
+        #region IBHBulletUpdater Implementation
 
-        public void InitUpdatable() { BHUpdatableHelper.DefaultInit(this); }
+        public void InitUpdater() { BHUpdatableHelper.DefaultInit(this); }
 
         public void UpdateBullets(float deltaTime)
         {
@@ -31,7 +31,7 @@ namespace BulletHell3D
             BulletRemove();
         }
 
-        public void DestroyUpdatable()
+        public void DestroyUpdater()
         {
             BHUpdatableHelper.DefaultDestroy(this);
         }
@@ -53,7 +53,7 @@ namespace BulletHell3D
 
         private void OnDestroy() 
         {
-            DestroyUpdatable();    
+            DestroyUpdater();    
         }
     }
 }

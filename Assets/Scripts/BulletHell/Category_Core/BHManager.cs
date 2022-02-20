@@ -80,9 +80,9 @@ namespace BulletHell3D
 
         private BHRenderGroup[] renderGroups;
         private Dictionary<BHRenderObject,BHRenderGroup> object2Group = new Dictionary<BHRenderObject, BHRenderGroup>();
-        private List<IBHUpdatable> updatables = new List<IBHUpdatable>();
-        private Queue<IBHUpdatable> addQueue = new Queue<IBHUpdatable>();
-        private Queue<IBHUpdatable> removeQueue = new Queue<IBHUpdatable>();
+        private List<IBHBulletUpdater> updatables = new List<IBHBulletUpdater>();
+        private Queue<IBHBulletUpdater> addQueue = new Queue<IBHBulletUpdater>();
+        private Queue<IBHBulletUpdater> removeQueue = new Queue<IBHBulletUpdater>();
 
         public void Awake() 
         {
@@ -141,7 +141,7 @@ namespace BulletHell3D
 
                 // Update bullets' info by the result of sphere casts.
                 counter = 0;
-                foreach(IBHUpdatable updatable in updatables)
+                foreach(IBHBulletUpdater updatable in updatables)
                 {
                     var list = updatable.bullets;
                     foreach(BHBullet bullet in list)
@@ -195,7 +195,7 @@ namespace BulletHell3D
 
             //Update positions
             float deltaTime = Time.fixedDeltaTime;
-            foreach(IBHUpdatable updatable in updatables)
+            foreach(IBHBulletUpdater updatable in updatables)
             {
                 updatable.RemoveBullets();
                 updatable.UpdateBullets(deltaTime);
@@ -204,7 +204,7 @@ namespace BulletHell3D
             //Update matrices
             foreach(BHRenderGroup group in renderGroups)
                 group.count = 0;
-            foreach(IBHUpdatable updatable in updatables)
+            foreach(IBHBulletUpdater updatable in updatables)
             {
                 var list = updatable.bullets;
                 foreach(BHBullet bullet in list)
@@ -219,7 +219,7 @@ namespace BulletHell3D
 
             #region Collision Detection
 
-            foreach(IBHUpdatable updatable in updatables)
+            foreach(IBHBulletUpdater updatable in updatables)
                 totalBulletCount += updatable.bullets.Count;
 
             // Set up the command buffers
@@ -228,7 +228,7 @@ namespace BulletHell3D
 
             // Set the data of sphere cast commands
             counter = 0;
-            foreach(IBHUpdatable updatable in updatables)
+            foreach(IBHBulletUpdater updatable in updatables)
             {
                 var list = updatable.bullets;
                 foreach(BHBullet bullet in list)
@@ -282,12 +282,12 @@ namespace BulletHell3D
             }
         }
 
-        public void AddUpdatable(IBHUpdatable updatable)
+        public void AddUpdatable(IBHBulletUpdater updatable)
         {
             addQueue.Enqueue(updatable);
         }
 
-        public void RemoveUpdatable(IBHUpdatable updatable)
+        public void RemoveUpdatable(IBHBulletUpdater updatable)
         {
             removeQueue.Enqueue(updatable);
         }

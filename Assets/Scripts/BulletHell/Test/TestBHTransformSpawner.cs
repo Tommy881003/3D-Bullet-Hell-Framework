@@ -6,10 +6,10 @@ using BulletHell3D;
 
 public class TestBHTransformSpawner : MonoBehaviour
 {
-    /*[SerializeField]
+    [SerializeField]
     private BHTransformUpdater bHTransformA;
     [SerializeField]
-    private BHTransformUpdater bHTransformB;*/
+    private BHTransformUpdater bHTransformB;
 
     [SerializeField]
     private BHPattern tracerPattern;
@@ -24,8 +24,8 @@ public class TestBHTransformSpawner : MonoBehaviour
     void Shoot()
     {
         BHTracerUpdater.instance.AddPattern(tracerPattern, transform.position, Random.insideUnitSphere, 0);
-        /*BHTransformUpdater newTransform = Instantiate((counter % 2 == 0)? bHTransformA.gameObject : bHTransformB.gameObject, transform.position, Quaternion.identity).GetComponent<BHTransformUpdater>();
+        BHTransformUpdater newTransform = Instantiate((counter % 2 == 0)? bHTransformA.gameObject : bHTransformB.gameObject, transform.position, Quaternion.identity).GetComponent<BHTransformUpdater>();
         newTransform.Init(transform.position,Random.insideUnitSphere,0);
-        counter++;*/
+        counter++;
     }
 }

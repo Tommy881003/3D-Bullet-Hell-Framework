@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BulletHell3D
 {
-    public sealed class BHTracerUpdater : MonoBehaviour, IBHUpdatable
+    public sealed class BHTracerUpdater : MonoBehaviour, IBHBulletUpdater
     {
         private class TracerAddon
         {
@@ -39,7 +39,7 @@ namespace BulletHell3D
                     if(manager == null)
                         BHExceptionRaiser.RaiseException(BHException.ManagerNotFound);
                     _instance = manager.gameObject.AddComponent<BHTracerUpdater>();
-                    _instance.InitUpdatable();
+                    _instance.InitUpdater();
                 }
                 return _instance;
             }
@@ -65,9 +65,9 @@ namespace BulletHell3D
             player = DependencyContainer.GetDependency<Player>() as Player; 
         }
 
-        #region IBHUpdatable Implementation
+        #region IBHBulletUpdater Implementation
 
-        public void InitUpdatable() { BHUpdatableHelper.DefaultInit(this); }
+        public void InitUpdater() { BHUpdatableHelper.DefaultInit(this); }
 
         public void UpdateBullets(float deltaTime)
         {
@@ -129,7 +129,7 @@ namespace BulletHell3D
             BHUpdatableHelper.DefaultRemoveBullets<TracerAddon>(this, ref addons);
         }
 
-        public void DestroyUpdatable() 
+        public void DestroyUpdater() 
         { 
             BHUpdatableHelper.DefaultDestroy(this);
         }
@@ -230,7 +230,7 @@ namespace BulletHell3D
 
         private void OnDestroy() 
         {
-            DestroyUpdatable(); 
+            DestroyUpdater(); 
             _instance = null; 
         }
     }

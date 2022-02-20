@@ -28,4 +28,18 @@ namespace BulletHell3D
             position = newPos;
         }
     }
+
+    public struct BHRay
+    {
+        public Vector3 origin;
+        public Vector3 direction;
+        public float length;
+        public Vector3 end { get { return origin + direction * length; } }
+        public BHRay(Vector3 origin, Vector3 direction, float length)
+        {
+            this.origin = origin;
+            this.direction = direction.normalized;
+            this.length = length;
+        }
+    }
 }

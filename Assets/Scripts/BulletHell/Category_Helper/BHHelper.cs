@@ -30,7 +30,7 @@ namespace BulletHell3D
     {
         private static BHManager manager = null;
 
-        public static void DefaultInit(IBHUpdatable updatable)
+        public static void DefaultInit(IBHBulletUpdater updatable)
         {
             if(manager == null)
             {
@@ -41,7 +41,7 @@ namespace BulletHell3D
             manager.AddUpdatable(updatable);
         }
 
-        public static void DefaultDestroy(IBHUpdatable updatable)
+        public static void DefaultDestroy(IBHBulletUpdater updatable)
         {
             updatable.bullets.Clear();
             if(manager == null)
@@ -52,7 +52,7 @@ namespace BulletHell3D
                 manager.RemoveUpdatable(updatable);
         }
 
-        public static void DefaultRemoveBullets(IBHUpdatable updatable)
+        public static void DefaultRemoveBullets(IBHBulletUpdater updatable)
         {
             var bullets = updatable.bullets;
             for(int i = bullets.Count - 1; i >= 0; i --)
@@ -64,7 +64,7 @@ namespace BulletHell3D
             }
         }
 
-        public static void DefaultRemoveBullets<T1>(IBHUpdatable updatable, ref List<T1> list1)
+        public static void DefaultRemoveBullets<T1>(IBHBulletUpdater updatable, ref List<T1> list1)
         {
             var bullets = updatable.bullets;
             for(int i = bullets.Count - 1; i >= 0; i --)
@@ -77,7 +77,7 @@ namespace BulletHell3D
             }
         }
 
-        public static void DefaultRemoveBullets<T1, T2>(IBHUpdatable updatable, ref List<T1> list1, ref List<T2> list2)
+        public static void DefaultRemoveBullets<T1, T2>(IBHBulletUpdater updatable, ref List<T1> list1, ref List<T2> list2)
         {
             var bullets = updatable.bullets;
             for(int i = bullets.Count - 1; i >= 0; i --)
@@ -91,7 +91,7 @@ namespace BulletHell3D
             }
         }
 
-        public static void DefaultRemoveBullets<T1, T2, T3>(IBHUpdatable updatable, ref List<T1> list1, ref List<T2> list2, ref List<T3> list3)
+        public static void DefaultRemoveBullets<T1, T2, T3>(IBHBulletUpdater updatable, ref List<T1> list1, ref List<T2> list2, ref List<T3> list3)
         {
             var bullets = updatable.bullets;
             for(int i = bullets.Count - 1; i >= 0; i --)

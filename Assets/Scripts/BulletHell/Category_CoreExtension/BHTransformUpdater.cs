@@ -7,7 +7,7 @@ namespace BulletHell3D
     // Memo: Behaviour of BHTransformUpdater
     // 1. CANNOT add bullets once initialized.
     // 2. Auto-destroy once there are no bullet left. (That is, if you create a transformUpdater with no bullets, it'll auto-destroy very soon.)
-    public class BHTransformUpdater : MonoBehaviour, IBHUpdatable
+    public class BHTransformUpdater : MonoBehaviour, IBHBulletUpdater
     {
         public List<BHBullet> bullets { get; protected set; } = new List<BHBullet>();
         protected List<Vector3> localPos = new List<Vector3>();
@@ -17,7 +17,7 @@ namespace BulletHell3D
 
         public void Init(Vector3 position, Vector3 forwardAxis, float angleInDeg)
         {
-            InitUpdatable();
+            InitUpdater();
 
             // Orthonormal vectors in relative coordinate.
             // Forward: z-axis
@@ -44,9 +44,9 @@ namespace BulletHell3D
             }
         }
 
-        #region IBHUpdatable Implementation
+        #region IBHBulletUpdater Implementation
 
-        public void InitUpdatable() { BHUpdatableHelper.DefaultInit(this); }
+        public void InitUpdater() { BHUpdatableHelper.DefaultInit(this); }
 
         public void UpdateBullets(float deltaTime)
         {
@@ -62,7 +62,7 @@ namespace BulletHell3D
             BHUpdatableHelper.DefaultRemoveBullets(this, ref localPos);
         }
 
-        public void DestroyUpdatable()
+        public void DestroyUpdater()
         {
             BHUpdatableHelper.DefaultDestroy(this);
         }
@@ -73,7 +73,7 @@ namespace BulletHell3D
 
         private void OnDestroy() 
         {
-            DestroyUpdatable();
+            DestroyUpdater();
         }
     }
 }
