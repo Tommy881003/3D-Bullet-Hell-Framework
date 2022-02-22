@@ -26,11 +26,11 @@ namespace BulletHell3D
         }
     }
 
-    public static class BHUpdatableHelper
+    public static class BHUpdaterHelper
     {
         private static BHManager manager = null;
 
-        public static void DefaultInit(IBHBulletUpdater updatable)
+        public static void DefaultInit(IBHUpdater updatable)
         {
             if(manager == null)
             {
@@ -41,9 +41,8 @@ namespace BulletHell3D
             manager.AddUpdatable(updatable);
         }
 
-        public static void DefaultDestroy(IBHBulletUpdater updatable)
+        public static void DefaultDestroy(IBHUpdater updatable)
         {
-            updatable.bullets.Clear();
             if(manager == null)
                 manager = BHManager.instance;
             //If manager REALLY is null, that almost certainly means the scene get destroyed.

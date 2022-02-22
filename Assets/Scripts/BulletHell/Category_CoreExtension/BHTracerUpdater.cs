@@ -25,7 +25,8 @@ namespace BulletHell3D
             // Maximum frames allowed for over-tracing.
             public const int overTraceFrameLimit = 3;
 
-            // TODO: Seems to miss something...?
+            // Time delayed for tracer bullet to start tracing.
+            public float traceWaitTime;
         }
 
         private static BHTracerUpdater _instance = null;
@@ -40,6 +41,9 @@ namespace BulletHell3D
                         BHExceptionRaiser.RaiseException(BHException.ManagerNotFound);
                     _instance = manager.gameObject.AddComponent<BHTracerUpdater>();
                     _instance.InitUpdater();
+                    
+                    trailPool = BHTrailPool.instance;
+                    player = DependencyContainer.GetDependency<Player>() as Player;
                 }
                 return _instance;
             }
@@ -49,25 +53,19 @@ namespace BulletHell3D
         private const float tracerSpeed = 20;
         private const float tracerTrailTime = 0.5f;
         private const float tracerRotateStrenth = 0.05f;
-        private const float overTraceThreshold = 0.75f;
+        private const float overTraceThreshold = 0.5f;
 
-        private BHTrailPool trailPool;
-        private Player player;
+        private static BHTrailPool trailPool;
+        private static Player player;
 
         public List<BHBullet> bullets { get; private set; } = new List<BHBullet>();
         private List<TracerAddon> addons = new List<TracerAddon>();
 
         private Queue<(BHBullet, TracerAddon)> addQueue = new Queue<(BHBullet, TracerAddon)>();
 
-        void Awake() 
-        { 
-            trailPool = BHTrailPool.instance;
-            player = DependencyContainer.GetDependency<Player>() as Player; 
-        }
-
         #region IBHBulletUpdater Implementation
 
-        public void InitUpdater() { BHUpdatableHelper.DefaultInit(this); }
+        public void InitUpdater() { BHUpdaterHelper.DefaultInit(this); }
 
         public void UpdateBullets(float deltaTime)
         {
@@ -97,7 +95,9 @@ namespace BulletHell3D
             {
                 bullets[i].SetPosition(bullets[i].position + addons[i].forward * addons[i].speed * deltaTime);
                 addons[i].tr.transform.position = bullets[i].position;
-                if(!addons[i].canTrace)
+                addons[i].traceWaitTime -= deltaTime;
+                
+                if(addons[i].traceWaitTime > 0 || !addons[i].canTrace)
                     continue;
                 
                 Vector3 bulletToPlayer = (player.transform.position - bullets[i].position).normalized;
@@ -126,26 +126,26 @@ namespace BulletHell3D
                 if(!bullets[i].isAlive)
                     trailPool.ReturnTrail(addons[i].tr);
             }
-            BHUpdatableHelper.DefaultRemoveBullets<TracerAddon>(this, ref addons);
+            BHUpdaterHelper.DefaultRemoveBullets<TracerAddon>(this, ref addons);
         }
 
         public void DestroyUpdater() 
         { 
-            BHUpdatableHelper.DefaultDestroy(this);
+            BHUpdaterHelper.DefaultDestroy(this);
         }
 
         #endregion
 
         // Policy: If there's short storage of trail renderers, dont spawn tracer bullets.
-        public void AddBullet(BHRenderObject renderObject, Vector3 position, Vector3 forward) 
+        public void AddBullet(BHRenderObject renderObject, Vector3 position, Vector3 forward, float speed = 20, float timeDelay = 0) 
         {
             if(trailPool.stockCount == 0)
                 return;
-            CreateTracerBullet(renderObject, position, forward);
+            CreateTracerBullet(renderObject, position, forward, speed, timeDelay);
         }
 
         // Policy: If there's short storage of trail renderers, dont spawn tracer bullets.
-        public void AddPattern(BHPattern pattern, Vector3 position, Vector3 forwardAxis, float angleInDeg) 
+        public void AddPattern(BHPattern pattern, Vector3 position, Vector3 forwardAxis, float angleInDeg, float speed = 20, float timeDelay = 0) 
         {
             int bulletCount = pattern.bullets.Count;
             if(trailPool.stockCount < bulletCount)
@@ -182,7 +182,9 @@ namespace BulletHell3D
             {                                                            // ↓ 
                 CreateTracerBullet(pattern.renderObject, position, vector.x * relativeRight + 
                                                                    vector.y * relativeUp + 
-                                                                   vector.z * relativeForward
+                                                                   vector.z * relativeForward,
+                                                                   speed,
+                                                                   timeDelay
                                   );
             }
         }
@@ -212,14 +214,15 @@ namespace BulletHell3D
         // So, after knowing the cause of error, the solution would be simple.
         // When adding bullets (step 4), we delayed the request till the collision checking process is completed. (AFTER step 1 is done)
         */
-        private void CreateTracerBullet(BHRenderObject renderObject, Vector3 position, Vector3 forward)
+        private void CreateTracerBullet(BHRenderObject renderObject, Vector3 position, Vector3 forward, float traceSpeed, float timeDelay)
         {
             BHBullet newBullet = new BHBullet(position, renderObject);
             TracerAddon newAddon = new TracerAddon() 
             { 
                 tr = trailPool.RequestTrail(),
                 forward = forward.normalized,
-                speed = tracerSpeed
+                speed = traceSpeed,
+                traceWaitTime = timeDelay
             };
             newAddon.tr.transform.position = position;
             newAddon.tr.startWidth = renderObject.radius * 2;

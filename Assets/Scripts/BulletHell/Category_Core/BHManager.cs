@@ -55,15 +55,6 @@ namespace BulletHell3D
 
     public class BHManager : MonoBehaviour
     {
-        private class BHRenderGroup
-        {
-            public BHRenderObject renderObject;
-            public Matrix4x4[] matrices = new Matrix4x4[1023];
-            public int count = 0;
-
-            public const int maxBulletCount = 1023;
-        }
-
         private static BHManager _instance = null;
         public static BHManager instance { get { return _instance; } }
         private const int renderMask = 31;
@@ -78,11 +69,40 @@ namespace BulletHell3D
         private LayerMask obstacleMask;
         private LayerMask playerMask;
 
+        #region BulletUpdater
+
+        private class BHRenderGroup
+        {
+            public BHRenderObject renderObject;
+            public Matrix4x4[] matrices = new Matrix4x4[1023];
+            public int count = 0;
+
+            public const int maxBulletCount = 1023;
+        }
+
         private BHRenderGroup[] renderGroups;
         private Dictionary<BHRenderObject,BHRenderGroup> object2Group = new Dictionary<BHRenderObject, BHRenderGroup>();
-        private List<IBHBulletUpdater> updatables = new List<IBHBulletUpdater>();
-        private Queue<IBHBulletUpdater> addQueue = new Queue<IBHBulletUpdater>();
-        private Queue<IBHBulletUpdater> removeQueue = new Queue<IBHBulletUpdater>();
+        private List<IBHBulletUpdater> bulletUpdaters = new List<IBHBulletUpdater>();
+        private Queue<IBHBulletUpdater> addBulletQueue = new Queue<IBHBulletUpdater>();
+        private Queue<IBHBulletUpdater> removeBulletQueue = new Queue<IBHBulletUpdater>();
+
+        private NativeArray<RaycastHit> bulletResults = default;
+        private NativeArray<SpherecastCommand> bulletCommands = default;
+        private JobHandle bulletHandle;
+
+        #endregion
+
+        #region RayUpdater
+
+        private List<IBHRayUpdater> rayUpdaters = new List<IBHRayUpdater>();
+        private Queue<IBHRayUpdater> addRayQueue = new Queue<IBHRayUpdater>();
+        private Queue<IBHRayUpdater> removeRayQueue = new Queue<IBHRayUpdater>();
+
+        private NativeArray<RaycastHit> rayResults = default;
+        private NativeArray<SpherecastCommand> rayCommands = default;
+        private JobHandle rayHandle;
+
+        #endregion
 
         public void Awake() 
         {
@@ -121,11 +141,8 @@ namespace BulletHell3D
         public void FixedUpdate() 
         {
             UpdateBullets();
+            UpdateRays();
         }
-
-        private NativeArray<RaycastHit> results = default;
-        private NativeArray<SpherecastCommand> commands = default;
-        private JobHandle rayHandle;
 
         private void UpdateBullets()
         {
@@ -134,25 +151,25 @@ namespace BulletHell3D
 
             #region Check Alive
 
-            if(results.IsCreated)
+            if(bulletResults.IsCreated)
             {
                 // Wait for the batch processing job to complete
-                rayHandle.Complete();
+                bulletHandle.Complete();
 
                 // Update bullets' info by the result of sphere casts.
                 counter = 0;
-                foreach(IBHBulletUpdater updatable in updatables)
+                foreach(IBHBulletUpdater updatable in bulletUpdaters)
                 {
                     var list = updatable.bullets;
                     foreach(BHBullet bullet in list)
                     {
-                        if(results[counter].collider != null)
+                        if(bulletResults[counter].collider != null)
                         {
-                            int colliderLayer = 1 << (results[counter].collider.gameObject.layer);
+                            int colliderLayer = 1 << (bulletResults[counter].collider.gameObject.layer);
 
                             bullet.isAlive = false;
                             if(useParticle)
-                                BHParticlePool.instance.RequestParticlePlay(results[counter].point);
+                                BHParticlePool.instance.RequestParticlePlay(bulletResults[counter].point);
 
                             //TODO: Make an event responds to specific layer hit. (for example: player's layer)
                             if((colliderLayer | obstacleMask) != 0)
@@ -169,24 +186,24 @@ namespace BulletHell3D
                 }
 
                 // Dispose the buffers
-                results.Dispose();
-                commands.Dispose();
+                bulletResults.Dispose();
+                bulletCommands.Dispose();
             }
 
             #endregion
 
             #region Add/Remove Updatables
 
-            while(addQueue.Count != 0)
+            while(addBulletQueue.Count != 0)
             {
-                var updatable = addQueue.Dequeue();
-                updatables.Add(updatable);
+                var updatable = addBulletQueue.Dequeue();
+                bulletUpdaters.Add(updatable);
             }
-            while(removeQueue.Count != 0)
+            while(removeBulletQueue.Count != 0)
             {
-                var updatable = removeQueue.Dequeue();
-                if(updatables.Contains(updatable))
-                    updatables.Remove(updatable);
+                var updatable = removeBulletQueue.Dequeue();
+                if(bulletUpdaters.Contains(updatable))
+                    bulletUpdaters.Remove(updatable);
             }
 
             #endregion
@@ -195,7 +212,7 @@ namespace BulletHell3D
 
             //Update positions
             float deltaTime = Time.fixedDeltaTime;
-            foreach(IBHBulletUpdater updatable in updatables)
+            foreach(IBHBulletUpdater updatable in bulletUpdaters)
             {
                 updatable.RemoveBullets();
                 updatable.UpdateBullets(deltaTime);
@@ -204,7 +221,7 @@ namespace BulletHell3D
             //Update matrices
             foreach(BHRenderGroup group in renderGroups)
                 group.count = 0;
-            foreach(IBHBulletUpdater updatable in updatables)
+            foreach(IBHBulletUpdater updatable in bulletUpdaters)
             {
                 var list = updatable.bullets;
                 foreach(BHBullet bullet in list)
@@ -219,16 +236,16 @@ namespace BulletHell3D
 
             #region Collision Detection
 
-            foreach(IBHBulletUpdater updatable in updatables)
+            foreach(IBHBulletUpdater updatable in bulletUpdaters)
                 totalBulletCount += updatable.bullets.Count;
 
             // Set up the command buffers
-            results = new NativeArray<RaycastHit>(totalBulletCount, Allocator.Persistent);
-            commands = new NativeArray<SpherecastCommand>(totalBulletCount, Allocator.Persistent);
+            bulletResults = new NativeArray<RaycastHit>(totalBulletCount, Allocator.Persistent);
+            bulletCommands = new NativeArray<SpherecastCommand>(totalBulletCount, Allocator.Persistent);
 
             // Set the data of sphere cast commands
             counter = 0;
-            foreach(IBHBulletUpdater updatable in updatables)
+            foreach(IBHBulletUpdater updatable in bulletUpdaters)
             {
                 var list = updatable.bullets;
                 foreach(BHBullet bullet in list)
@@ -240,7 +257,7 @@ namespace BulletHell3D
                     // Nothing, literally NOTHING.
                     // Wow, just wow.
                     // Fxxk this shit.  
-                    commands[counter] = new SpherecastCommand
+                    bulletCommands[counter] = new SpherecastCommand
                     (
                         bullet.position - bullet.delta,
                         bullet.renderObject.radius,
@@ -253,17 +270,114 @@ namespace BulletHell3D
             }
 
             // Schedule the batch of sphere casts
-            rayHandle = SpherecastCommand.ScheduleBatch(commands, results, 256, default(JobHandle));
+            bulletHandle = SpherecastCommand.ScheduleBatch(bulletCommands, bulletResults, 256, default(JobHandle));
 
             #endregion     
         }
 
-        public void Update()
+        //TODO: This really feels like duplication of code, which is kinda bad. (Violates DRY principle.)
+        //Might need a better way to implement this. 
+        private void UpdateRays()
         {
-            Render();
+            int totalRayCount = 0;
+            int counter = 0;
+
+            //This region is still not complete yet.
+            #region Check Alive
+
+            if(rayResults.IsCreated)
+            {
+                // Wait for the batch processing job to complete
+                rayHandle.Complete();
+
+                // Update rays' info by the result of sphere casts.
+                counter = 0;
+                foreach(IBHRayUpdater updatable in rayUpdaters)
+                {
+                    var list = updatable.rays;
+                    foreach(BHRay ray in list)
+                    {
+                        if(rayResults[counter].collider != null)
+                        {
+                            int colliderLayer = 1 << (rayResults[counter].collider.gameObject.layer);
+                            if((colliderLayer | playerMask) != 0)
+                            {
+                                Debug.Log("Hit Player");
+                            }
+                        }
+                        counter ++;
+                    }
+                }
+
+                // Dispose the buffers
+                rayResults.Dispose();
+                rayCommands.Dispose();
+            }
+
+            #endregion
+
+            #region Add/Remove Updatables
+
+            while(addRayQueue.Count != 0)
+            {
+                var updatable = addRayQueue.Dequeue();
+                rayUpdaters.Add(updatable);
+            }
+            while(removeRayQueue.Count != 0)
+            {
+                var updatable = removeRayQueue.Dequeue();
+                if(rayUpdaters.Contains(updatable))
+                    rayUpdaters.Remove(updatable);
+            }
+
+            #endregion
+        
+            #region Update Rays & Collision Detection
+
+            float deltaTime = Time.fixedDeltaTime;
+            foreach(IBHRayUpdater updatable in rayUpdaters)
+                updatable.UpdateRays(deltaTime);
+
+            foreach(IBHRayUpdater updatable in rayUpdaters)
+                totalRayCount += updatable.rays.Length;
+
+            // Set up the command buffers
+            rayResults = new NativeArray<RaycastHit>(totalRayCount, Allocator.Persistent);
+            rayCommands = new NativeArray<SpherecastCommand>(totalRayCount, Allocator.Persistent);
+
+            // Set the data of sphere cast commands
+            counter = 0;
+            foreach(IBHRayUpdater updatable in rayUpdaters)
+            {
+                var list = updatable.rays;
+                foreach(BHRay ray in list)
+                {
+                    // Player
+                    rayCommands[counter] = new SpherecastCommand
+                    (
+                        ray.origin,
+                        updatable.rayRadius,
+                        ray.direction * ray.length,
+                        1,
+                        collisionMask
+                    );
+
+                    counter ++;
+                }
+            }
+
+            // Schedule the batch of sphere casts
+            rayHandle = SpherecastCommand.ScheduleBatch(rayCommands, rayResults, 256, default(JobHandle));
+
+            #endregion
         }
 
-        private void Render()
+        public void Update()
+        {
+            RenderBullets();
+        }
+
+        private void RenderBullets()
         {
             foreach(BHRenderGroup group in renderGroups)
             {
@@ -282,14 +396,20 @@ namespace BulletHell3D
             }
         }
 
-        public void AddUpdatable(IBHBulletUpdater updatable)
+        public void AddUpdatable(IBHUpdater updatable)
         {
-            addQueue.Enqueue(updatable);
+            if(updatable is IBHBulletUpdater)
+                addBulletQueue.Enqueue(updatable as IBHBulletUpdater);
+            else if(updatable is IBHRayUpdater)
+                addRayQueue.Enqueue(updatable as IBHRayUpdater);
         }
 
-        public void RemoveUpdatable(IBHBulletUpdater updatable)
+        public void RemoveUpdatable(IBHUpdater updatable)
         {
-            removeQueue.Enqueue(updatable);
+            if(updatable is IBHBulletUpdater)
+                removeBulletQueue.Enqueue(updatable as IBHBulletUpdater);
+            else if(updatable is IBHRayUpdater)
+                removeRayQueue.Enqueue(updatable as IBHRayUpdater);
         }
     }
 }
