@@ -11,7 +11,7 @@ namespace BulletHell3D
     {
         public List<BHBullet> bullets { get; protected set; } = new List<BHBullet>();
         protected List<Vector3> forwards = new List<Vector3>();
-        private Queue<(BHBullet, Vector3)> addQueue = new Queue<(BHBullet, Vector3)>();
+        private Queue<BHBullet> addQueue = new Queue<BHBullet>();
 
         void Start()
         {
@@ -26,15 +26,14 @@ namespace BulletHell3D
         {
             while(addQueue.Count > 0)
             {
-                var pair = addQueue.Dequeue();
-                bullets.Add(pair.Item1);
-                forwards.Add(pair.Item2);
+                var bullet = addQueue.Dequeue();
+                bullets.Add(bullet);
             }
 
             UpdateCustom(deltaTime);
         }        
 
-        public void RemoveBullets()
+        public virtual void RemoveBullets()
         {
             BHUpdaterHelper.DefaultRemoveBullets(this, ref forwards);
         }
@@ -73,7 +72,8 @@ namespace BulletHell3D
         */
         public void AddBullet(BHRenderObject renderObject, Vector3 position, Vector3 forward)
         {
-            addQueue.Enqueue((new BHBullet(position, renderObject), forward));
+            addQueue.Enqueue(new BHBullet(position, renderObject));
+            forwards.Add(forward);
         }
 
         protected virtual void UpdateCustom(float deltaTime) {}
