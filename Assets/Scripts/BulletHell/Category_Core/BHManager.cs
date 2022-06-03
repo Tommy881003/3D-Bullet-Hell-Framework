@@ -69,6 +69,8 @@ namespace BulletHell3D
         private LayerMask obstacleMask;
         private LayerMask playerMask;
 
+        private Player player = null;
+
         #region BulletUpdater
 
         private class BHRenderGroup
@@ -76,6 +78,7 @@ namespace BulletHell3D
             public BHRenderObject renderObject;
             public Matrix4x4[] matrices = new Matrix4x4[1023];
             public int count = 0;
+            public MaterialPropertyBlock bulletPropertyBlock = new MaterialPropertyBlock();
 
             public const int maxBulletCount = 1023;
         }
@@ -134,7 +137,14 @@ namespace BulletHell3D
                 Matrix4x4 initialMatrix = Matrix4x4.Scale(Vector3.one * renderGroups[i].renderObject.radius * 2);
                 for(int j = 0; j < 1023; j ++)
                     renderGroups[i].matrices[j] = initialMatrix;
+                
+                // MaterialPropertyBlock array size is fixed, so you must create max capacity at start-up. (Thank you unity.)
+                renderGroups[i].bulletPropertyBlock.SetVectorArray("_BulletPosition", new Vector4[1023]);
+                renderGroups[i].bulletPropertyBlock.SetVectorArray("_PlayerPosition", new Vector4[1023]);
             }   
+
+            // Get player
+            player = DependencyContainer.GetDependency<Player>() as Player; 
         }
 
         //TODO: Might need a function that can wipe out all currently existing bullets. (For example: Boss killed)
@@ -230,6 +240,22 @@ namespace BulletHell3D
                     group.matrices[group.count].SetColumn(3, new Vector4(bullet.position.x, bullet.position.y, bullet.position.z, 1));
                     group.count++;
                 }
+            }
+
+            foreach(BHRenderGroup group in renderGroups)
+            {
+                // MaterialPropertyBlock cannot have zero-length array. (Thank you unity.)
+                int length = (group.count == 0)? 1 : group.count;
+
+                Vector4[] bulletPositions = new Vector4[length];
+                Vector4[] playerPositions = new Vector4[length];
+                for(int i = 0; i < group.count; i++) 
+                {
+                    bulletPositions[i] = group.matrices[i].GetColumn(3);
+                    playerPositions[i] = player.transform.position;
+                }
+                group.bulletPropertyBlock.SetVectorArray("_BulletPosition", bulletPositions);
+                group.bulletPropertyBlock.SetVectorArray("_PlayerPosition", playerPositions);
             }
 
             #endregion
@@ -388,7 +414,7 @@ namespace BulletHell3D
                     group.renderObject.material,
                     group.matrices,
                     group.count, 
-                    null, 
+                    group.bulletPropertyBlock, 
                     UnityEngine.Rendering.ShadowCastingMode.Off, 
                     false,
                     renderMask

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ThirdPersonController : MonoBehaviour
 {
@@ -39,36 +40,24 @@ public class ThirdPersonController : MonoBehaviour
     // player
     private float horizontalSpeed;
     private float verticalSpeed;
+    private Vector3 lastFrameVelocity = Vector3.zero;
 
     // timer
     private float jumpCooldown;
     private float fallTimer;
 
-    // animation IDs
-    private int animIDSpeed;
-    private int animIDGrounded;
-    private int animIDJump;
-    private int animIDFreeFall;
+    public UnityEvent StartMovingEvent { get; private set; } = new UnityEvent();
+    public UnityEvent StopMovingEvent { get; private set; } = new UnityEvent();
+    public UnityEvent JumpEvent { get; private set; } = new UnityEvent();
+    public UnityEvent LandEvent { get; private set; } = new UnityEvent();
 
-    private Animator animator;
     private CharacterController controller;
     private Transform mainCamera;
 
     private void Start() 
     {
-        animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         mainCamera = Camera.main.transform; 
-
-        AssignAnimationIDs();
-    }
-
-    private void AssignAnimationIDs()
-    {
-        animIDSpeed = Animator.StringToHash("Speed");
-        animIDGrounded = Animator.StringToHash("Grounded");
-        animIDJump = Animator.StringToHash("Jump");
-        animIDFreeFall = Animator.StringToHash("FreeFall");
     }
 
     void Update()
@@ -90,24 +79,19 @@ public class ThirdPersonController : MonoBehaviour
             fallTimer = fallTimeout;
             jumpCooldown -= Time.deltaTime;
 
-            animator.SetBool(animIDJump, false);
-            animator.SetBool(animIDFreeFall, false);
-
             if(Input.GetKeyDown(KeyCode.Space) && jumpCooldown < 0)
             {
                 // the square root of H * -2 * G = how much speed needed to reach desired height
 			    verticalSpeed = Mathf.Sqrt(jumpHeight * -2f * gravity);
                 jumpCooldown = jumpTimeout;
-                animator.SetBool(animIDJump, true);
+
+                JumpEvent.Invoke();
             }
         }
         else
         {
             fallTimer -= Time.deltaTime;
             jumpCooldown = jumpTimeout;
-
-            if(fallTimer < 0)
-                animator.SetBool(animIDFreeFall, true);
         }
 
         verticalSpeed += gravity * Time.deltaTime;
@@ -117,9 +101,12 @@ public class ThirdPersonController : MonoBehaviour
     {
         // set sphere position, with offset
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z);
-        grounded = Physics.CheckSphere(spherePosition, groundedRadius, groundLayers, QueryTriggerInteraction.Ignore);
+        var checkResult = Physics.CheckSphere(spherePosition, groundedRadius, groundLayers, QueryTriggerInteraction.Ignore);
+        
+        if(grounded == false && checkResult == true)
+            LandEvent.Invoke();
 
-        animator.SetBool(animIDGrounded, grounded);
+        grounded = checkResult;
     }
 
     private void Move()
@@ -134,11 +121,14 @@ public class ThirdPersonController : MonoBehaviour
         if(Input.GetKey(KeyCode.D))
             rawDirection += Vector3.right;
 
-        //Debug.Log(rawDirection);
+        if(lastFrameVelocity == Vector3.zero && rawDirection != Vector3.zero)
+            StartMovingEvent.Invoke();
+        if(lastFrameVelocity != Vector3.zero && rawDirection == Vector3.zero)
+            StopMovingEvent.Invoke();
+        lastFrameVelocity = rawDirection;
         
         if(rawDirection == Vector3.zero)
             horizontalSpeed = Mathf.Max(horizontalSpeed - acclerationStrenth * Time.deltaTime, 0);
-        //TODO: This part have a bug, when the avatar changes from sprinting to walking, the animation doesn't crossfade smoothly.
         else
         {
             if(Input.GetKey(KeyCode.LeftShift))
@@ -151,8 +141,6 @@ public class ThirdPersonController : MonoBehaviour
                     horizontalSpeed = Mathf.Min(horizontalSpeed + acclerationStrenth * Time.deltaTime, moveSpeed);
             }
         }  
-
-        animator.SetFloat(animIDSpeed, horizontalSpeed);
 
         Vector3 direction = Vector3.zero;
         if(rawDirection.sqrMagnitude > 0f)
