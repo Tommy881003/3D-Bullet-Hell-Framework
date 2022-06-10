@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bf93dbd05bc13b4086f778fe5c8e029, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  demoRenderObj: {fileID: 11400000, guid: af7db04b26483924caf97e980e104ea4, type: 2}
+  demoRenderObj: {fileID: 11400000, guid: 35d72fd570ee14447ae27f0b18bc0585, type: 2}
   demoUpdater: {fileID: 104972097}
   burstBulletCount: 100
   pattern: {fileID: 11400000, guid: c74d5abf4ef4c494a815c4f91d1d3944, type: 2}
@@ -2624,10 +2624,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63f2699dec1330340bada20dc81574de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debug: 1
   renderObjects:
   - {fileID: 11400000, guid: 35d72fd570ee14447ae27f0b18bc0585, type: 2}
-  - {fileID: 11400000, guid: a312988d9ab4fa24f99f8e688bd78c05, type: 2}
-  - {fileID: 11400000, guid: af7db04b26483924caf97e980e104ea4, type: 2}
   - {fileID: 11400000, guid: 11b13b852ca639d4c939e87e6e722b42, type: 2}
   useParticle: 1
 --- !u!4 &1894618512
