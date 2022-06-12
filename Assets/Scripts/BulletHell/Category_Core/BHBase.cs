@@ -32,13 +32,13 @@ namespace BulletHell3D
     public struct BHRay
     {
         public Vector3 origin;
-        public Vector3 direction;
+        public Vector3 normalizedDirection;
         public float length;
-        public Vector3 end { get { return origin + direction * length; } }
+        public Vector3 end { get { return origin + normalizedDirection * length; } }
         public BHRay(Vector3 origin, Vector3 direction, float length)
         {
             this.origin = origin;
-            this.direction = direction.normalized;
+            this.normalizedDirection = direction.normalized;
             this.length = length;
         }
     }

@@ -203,8 +203,8 @@ namespace BulletHell3D
                     (
                         bullet.position - bullet.delta,
                         bullet.renderObject.radius,
-                        bullet.delta,
-                        1,
+                        bullet.delta.normalized,
+                        bullet.delta.magnitude,
                         collisionMask
                     );
                     counter++;
@@ -212,7 +212,7 @@ namespace BulletHell3D
             }
 
             // Schedule the batch of sphere casts
-            bulletHandle = SpherecastCommand.ScheduleBatch(bulletCommands, bulletResults, 256, default(JobHandle));
+            bulletHandle = SpherecastCommand.ScheduleBatch(bulletCommands, bulletResults, 256);
 
             #endregion     
         }
@@ -299,8 +299,8 @@ namespace BulletHell3D
                     (
                         ray.origin,
                         updatable.rayRadius,
-                        ray.direction * ray.length,
-                        1,
+                        ray.normalizedDirection,
+                        ray.length,
                         collisionMask
                     );
 
