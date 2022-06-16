@@ -5,12 +5,12 @@ using DG.Tweening;
 
 public class PlayerVisual : MonoBehaviour
 {
-    private ThirdPersonController controller;
+    private PlayerController controller;
 
     // Start is called before the first frame update
     void Start()
     {
-        controller = GetComponentInParent<ThirdPersonController>();
+        controller = GetComponentInParent<PlayerController>();
         controller.StartMovingEvent.AddListener(StartMoveTween);
         controller.StopMovingEvent.AddListener(StopMoveTween);
         controller.JumpEvent.AddListener(JumpTween);
