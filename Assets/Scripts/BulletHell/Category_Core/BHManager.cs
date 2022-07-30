@@ -89,7 +89,8 @@ namespace BulletHell3D
         public void FixedUpdate() 
         {
             UpdateBullets();
-            UpdateRays();
+            //Focus on bullets only right now.
+            //UpdateRays();
         }
 
         private void UpdateBullets()
@@ -189,8 +190,8 @@ namespace BulletHell3D
                 totalBulletCount += updatable.bullets.Count;
 
             // Set up the command buffers
-            bulletResults = new NativeArray<RaycastHit>(totalBulletCount, Allocator.Persistent);
-            bulletCommands = new NativeArray<SpherecastCommand>(totalBulletCount, Allocator.Persistent);
+            bulletResults = new NativeArray<RaycastHit>(totalBulletCount, Allocator.TempJob);
+            bulletCommands = new NativeArray<SpherecastCommand>(totalBulletCount, Allocator.TempJob);
 
             // Set the data of sphere cast commands
             counter = 0;
@@ -219,6 +220,7 @@ namespace BulletHell3D
 
         //TODO: This really feels like duplication of code, which is kinda bad. (Violates DRY principle.)
         //Might need a better way to implement this. 
+        /*
         private void UpdateRays()
         {
             int totalRayCount = 0;
@@ -313,6 +315,7 @@ namespace BulletHell3D
 
             #endregion
         }
+        */
 
         public void Update()
         {
