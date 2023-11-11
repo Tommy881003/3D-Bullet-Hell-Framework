@@ -3,6 +3,8 @@
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
 Assets/AssetStoreTools*
 
 # Visual Studio cache directory
@@ -35,3 +37,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+.vscode

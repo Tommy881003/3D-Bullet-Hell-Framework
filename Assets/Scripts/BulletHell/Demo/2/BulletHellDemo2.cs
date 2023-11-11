@@ -33,14 +33,14 @@ public class BulletHellDemo2 : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha2))
+        if (Input.GetKeyDown(KeyCode.Alpha2))
             StartCoroutine(Showcase());
     }
 
     IEnumerator Showcase()
     {
         GameObject[] objects = new GameObject[patternCount];
-        for(int i = 0; i < patternCount; i++)
+        for (int i = 0; i < patternCount; i++)
         {
             objects[i] = new GameObject();
             objects[i].transform.position = transform.position;
@@ -52,9 +52,9 @@ public class BulletHellDemo2 : MonoBehaviour
             yield return new WaitForSeconds(spawnPatternGap);
         }
         yield return new WaitForSeconds(waitToDropTime);
-        for(int i = 0; i < patternCount; i++)
+        for (int i = 0; i < patternCount; i++)
         {
-            objects[i].transform.DOMoveY(0,dropTime).SetEase(dropEase);
+            objects[i].transform.DOMoveY(0, dropTime).SetEase(dropEase);
             yield return new WaitForSeconds(spawnPatternGap);
         }
     }

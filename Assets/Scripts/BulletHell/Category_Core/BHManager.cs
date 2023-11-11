@@ -29,7 +29,7 @@ namespace BulletHell3D
 
         private int totalBulletCount = 0;
         private BHRenderGroup[] renderGroups;
-        private Dictionary<BHRenderObject,BHRenderGroup> object2Group = new Dictionary<BHRenderObject, BHRenderGroup>();
+        private Dictionary<BHRenderObject, BHRenderGroup> object2Group = new Dictionary<BHRenderObject, BHRenderGroup>();
         private List<IBHBulletUpdater> bulletUpdaters = new List<IBHBulletUpdater>();
         private Queue<IBHBulletUpdater> addBulletQueue = new Queue<IBHBulletUpdater>();
         private Queue<IBHBulletUpdater> removeBulletQueue = new Queue<IBHBulletUpdater>();
@@ -52,18 +52,18 @@ namespace BulletHell3D
 
         #endregion
 
-        public void Awake() 
+        public void Awake()
         {
-            if(_instance == null)
+            if (_instance == null)
                 _instance = this;
             else
             {
                 Destroy(gameObject);
                 return;
-            }    
+            }
         }
 
-        public void Start() 
+        public void Start()
         {
             CollisionGroups collisionGroups = CollisionGroups.instance;
             obstacleMask = collisionGroups.obstacleMask;
@@ -72,21 +72,21 @@ namespace BulletHell3D
 
             // Initialize rendering params.
             renderGroups = new BHRenderGroup[renderObjects.Length];
-            for(int i = 0; i < renderObjects.Length; i++)
+            for (int i = 0; i < renderObjects.Length; i++)
             {
                 renderGroups[i] = new BHRenderGroup(renderObjects[i]);
                 object2Group.Add(renderObjects[i], renderGroups[i]);
-            }   
+            }
         }
 
-        void OnGUI() 
+        void OnGUI()
         {
-            if(debug)
+            if (debug)
                 GUI.Label(new Rect(5, 5, 200, 30), "Instance Count: " + totalBulletCount.ToString());
         }
 
         //TODO: Might need a function that can wipe out all currently existing bullets. (For example: Boss killed)
-        public void FixedUpdate() 
+        public void FixedUpdate()
         {
             UpdateBullets();
             //Focus on bullets only right now.
@@ -96,40 +96,40 @@ namespace BulletHell3D
         private void UpdateBullets()
         {
             totalBulletCount = 0;
-            int counter = 0;
 
             #region Check Alive
 
-            if(bulletResults.IsCreated)
+            if (bulletResults.IsCreated)
             {
                 // Wait for the batch processing job to complete
                 bulletHandle.Complete();
 
                 // Update bullets' info by the result of sphere casts.
-                counter = 0;
-                foreach(IBHBulletUpdater updatable in bulletUpdaters)
+                int i = 0;
+                foreach (IBHBulletUpdater updatable in bulletUpdaters)
                 {
                     var list = updatable.bullets;
-                    foreach(BHBullet bullet in list)
+                    foreach (BHBullet bullet in list)
                     {
-                        if(bulletResults[counter].collider != null)
+                        if (bulletResults[i].collider != null)
                         {
-                            int colliderLayer = 1 << (bulletResults[counter].collider.gameObject.layer);
+                            int colliderLayer = 1 << (bulletResults[i].collider.gameObject.layer);
 
                             bullet.isAlive = false;
-                            if(useParticle)
-                                BHParticlePool.instance.RequestParticlePlay(bulletResults[counter].point);
+                            if (useParticle)
+                                BHParticlePool.instance.RequestParticlePlay(bulletResults[i].point);
 
-                            if((colliderLayer | obstacleMask) != 0)
+                            if ((colliderLayer & obstacleMask) != 0)
                             {
                                 // Bullet hit obstacle
                             }
-                            if((colliderLayer | playerMask) != 0)
+                            if ((colliderLayer & playerMask) != 0)
                             {
                                 // Bullet hit player
+                                Debug.Log("Hit player");
                             }
                         }
-                        counter++;
+                        i++;
                     }
                 }
 
@@ -138,19 +138,22 @@ namespace BulletHell3D
                 bulletCommands.Dispose();
             }
 
+            Debug.Assert(!bulletResults.IsCreated);
+            Debug.Assert(!bulletCommands.IsCreated);
+
             #endregion
 
             #region Add/Remove Updatables
 
-            while(addBulletQueue.Count != 0)
+            while (addBulletQueue.Count != 0)
             {
                 var updatable = addBulletQueue.Dequeue();
                 bulletUpdaters.Add(updatable);
             }
-            while(removeBulletQueue.Count != 0)
+            while (removeBulletQueue.Count != 0)
             {
                 var updatable = removeBulletQueue.Dequeue();
-                if(bulletUpdaters.Contains(updatable))
+                if (bulletUpdaters.Contains(updatable))
                     bulletUpdaters.Remove(updatable);
             }
 
@@ -160,55 +163,63 @@ namespace BulletHell3D
 
             //Update positions
             float deltaTime = Time.fixedDeltaTime;
-            foreach(IBHBulletUpdater updatable in bulletUpdaters)
+            foreach (IBHBulletUpdater updatable in bulletUpdaters)
             {
                 updatable.RemoveBullets();
                 updatable.UpdateBullets(deltaTime);
             }
 
             //Update render group
-            foreach(BHRenderGroup group in renderGroups)
+            foreach (BHRenderGroup group in renderGroups)
                 group.InvalidateOldBatchedRenderData();
-            foreach(IBHBulletUpdater updatable in bulletUpdaters)
+            foreach (IBHBulletUpdater updatable in bulletUpdaters)
             {
                 var list = updatable.bullets;
-                foreach(BHBullet bullet in list)
+                foreach (BHBullet bullet in list)
                 {
                     BHRenderGroup group = object2Group[bullet.renderObject];
                     // TODO: Support color modification at runtime.
                     group.SetBulletRenderData(bullet.position);
                 }
             }
-            foreach(BHRenderGroup group in renderGroups)
+            foreach (BHRenderGroup group in renderGroups)
                 group.FinalizeBatchedRenderData();
 
             #endregion
 
             #region Collision Detection
 
-            foreach(IBHBulletUpdater updatable in bulletUpdaters)
+            foreach (IBHBulletUpdater updatable in bulletUpdaters)
                 totalBulletCount += updatable.bullets.Count;
+
+            if (totalBulletCount == 0)
+                return;
 
             // Set up the command buffers
             bulletResults = new NativeArray<RaycastHit>(totalBulletCount, Allocator.TempJob);
             bulletCommands = new NativeArray<SpherecastCommand>(totalBulletCount, Allocator.TempJob);
 
             // Set the data of sphere cast commands
-            counter = 0;
-            foreach(IBHBulletUpdater updatable in bulletUpdaters)
             {
-                var list = updatable.bullets;
-                foreach(BHBullet bullet in list)
+                int i = 0;
+                foreach (IBHBulletUpdater updatable in bulletUpdaters)
                 {
-                    bulletCommands[counter] = new SpherecastCommand
-                    (
-                        bullet.position - bullet.delta,
-                        bullet.renderObject.radius,
-                        bullet.delta.normalized,
-                        bullet.delta.magnitude,
-                        collisionMask
-                    );
-                    counter++;
+                    var list = updatable.bullets;
+                    foreach (BHBullet bullet in list)
+                    {
+                        bulletCommands[i] = new SpherecastCommand
+                        (
+                            bullet.position - bullet.delta,
+                            bullet.renderObject.radius,
+                            bullet.delta.normalized,
+                            new QueryParameters(
+                                collisionMask,
+                                true, QueryTriggerInteraction.UseGlobal, false
+                            ),
+                            bullet.delta.magnitude
+                        );
+                        i++;
+                    }
                 }
             }
 
@@ -324,9 +335,9 @@ namespace BulletHell3D
 
         private void RenderBullets()
         {
-            foreach(BHRenderGroup group in renderGroups)
+            foreach (BHRenderGroup group in renderGroups)
             {
-                for(int i = 0; i < group.batchCount; i++)
+                for (int i = 0; i < group.batchCount; i++)
                 {
                     Graphics.DrawMeshInstanced
                     (
@@ -334,9 +345,9 @@ namespace BulletHell3D
                         0,
                         group.renderObject.material,
                         group.batches[i].matrices,
-                        (i == group.batchCount - 1)? group.count % BHRenderGroup.RENDER_NUM_PER_BATCH : BHRenderGroup.RENDER_NUM_PER_BATCH, 
-                        group.batches[i].propertyBlock, 
-                        UnityEngine.Rendering.ShadowCastingMode.Off, 
+                        (i == group.batchCount - 1) ? group.count % BHRenderGroup.RENDER_NUM_PER_BATCH : BHRenderGroup.RENDER_NUM_PER_BATCH,
+                        group.batches[i].propertyBlock,
+                        UnityEngine.Rendering.ShadowCastingMode.Off,
                         false,
                         renderMask
                     );
@@ -346,26 +357,26 @@ namespace BulletHell3D
 
         public void AddUpdatable(IBHUpdater updatable)
         {
-            if(updatable is IBHBulletUpdater)
+            if (updatable is IBHBulletUpdater)
                 addBulletQueue.Enqueue(updatable as IBHBulletUpdater);
-            else if(updatable is IBHRayUpdater)
+            else if (updatable is IBHRayUpdater)
                 addRayQueue.Enqueue(updatable as IBHRayUpdater);
         }
 
         public void RemoveUpdatable(IBHUpdater updatable)
         {
-            if(updatable is IBHBulletUpdater)
+            if (updatable is IBHBulletUpdater)
                 removeBulletQueue.Enqueue(updatable as IBHBulletUpdater);
-            else if(updatable is IBHRayUpdater)
+            else if (updatable is IBHRayUpdater)
                 removeRayQueue.Enqueue(updatable as IBHRayUpdater);
         }
 
-        private void OnDisable() 
+        private void OnDisable()
         {
-            bulletResults.Dispose();
-            bulletCommands.Dispose();
-            rayResults.Dispose();
-            rayCommands.Dispose();    
+            if (bulletResults.IsCreated) bulletResults.Dispose();
+            if (bulletCommands.IsCreated) bulletCommands.Dispose();
+            if (rayResults.IsCreated) rayResults.Dispose();
+            if (rayCommands.IsCreated) rayCommands.Dispose();
         }
     }
 }
