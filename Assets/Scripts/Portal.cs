@@ -7,8 +7,16 @@ public class Portal : MonoBehaviour
 {
     public System.Guid id;
 
+    [SerializeField]
+    private float yOffset;
+
     [Inject]
     private readonly PortalRepository repository;
+
+    void Start()
+    {
+        transform.Translate(Vector3.up * this.yOffset);
+    }
 
     void OnDestroy()
     {
