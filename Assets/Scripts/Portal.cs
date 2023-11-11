@@ -38,7 +38,7 @@ public class Portal : MonoBehaviour
             return;
         }
 
-        var delta = Random.onUnitSphere * 2;
+        var delta = Random.onUnitSphere * 3;
         delta.y = 0;
         player.SetPosition(anotherPortal.transform.position + delta);
         SceneAudioManager.instance.PlayByName("Portal");
