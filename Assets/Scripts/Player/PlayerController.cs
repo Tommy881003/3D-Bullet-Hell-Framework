@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using VContainer;
 
 public class PlayerController : MonoBehaviour
 {
@@ -53,10 +54,13 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Transform mainCamera;
 
-    private void Start() 
+    [Inject]
+    private PortalRepository portalRepository;
+
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
-        mainCamera = Camera.main.transform; 
+        mainCamera = Camera.main.transform;
     }
 
     void Update()
@@ -76,12 +80,14 @@ public class PlayerController : MonoBehaviour
     {
         #region Jump
 
-        if(Input.GetKeyDown(KeyCode.Space) && canJump)
+        if (Input.GetKeyDown(KeyCode.Space) && canJump)
         {
             // the square root of H * -2 * G = how much speed needed to reach desired height
             verticalSpeed = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpCooldown = jumpTimeout;
         }
+        if (Input.GetKeyDown(KeyCode.V))
+            this.createPortal();
 
         #endregion
     }
@@ -89,14 +95,27 @@ public class PlayerController : MonoBehaviour
     private void DetectKey()
     {
         rawDirection = Vector3.zero;
-        if(Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W))
             rawDirection += Vector3.forward;
-        if(Input.GetKey(KeyCode.S))
+        if (Input.GetKey(KeyCode.S))
             rawDirection += Vector3.back;
-        if(Input.GetKey(KeyCode.A))
+        if (Input.GetKey(KeyCode.A))
             rawDirection += Vector3.left;
-        if(Input.GetKey(KeyCode.D))
+        if (Input.GetKey(KeyCode.D))
             rawDirection += Vector3.right;
+    }
+
+    private void createPortal()
+    {
+        Debug.Assert(this.portalRepository != null);
+
+        float distance = 10;
+        Vector3 spawnDelta = mainCamera.forward;
+        spawnDelta.y = 0;
+        spawnDelta.Normalize();
+        spawnDelta *= distance;
+
+        var portal = this.portalRepository.Create(transform.position + spawnDelta);
     }
 
     private void GroundCheck()
@@ -112,11 +131,11 @@ public class PlayerController : MonoBehaviour
     {
         #region Vertical Movement
 
-        if(grounded)
+        if (grounded)
         {
             fallStateTimer = 0;
             jumpCooldown -= Time.fixedDeltaTime;
-            if(verticalSpeed < 0)
+            if (verticalSpeed < 0)
                 verticalSpeed = 0;
         }
         else
@@ -130,24 +149,24 @@ public class PlayerController : MonoBehaviour
 
         #region Horizontal Movement
 
-        if(rawDirection == Vector3.zero)
+        if (rawDirection == Vector3.zero)
             horizontalSpeed = Mathf.Max(horizontalSpeed - acclerationStrenth * Time.fixedDeltaTime, 0);
         else
         {
             // HACK: LeftShift + Space cause keyboard ghosting... crap.
-            if(Input.GetKey(KeyCode.Mouse2))
+            if (Input.GetKey(KeyCode.Mouse2))
                 horizontalSpeed = Mathf.Min(horizontalSpeed + acclerationStrenth * Time.fixedDeltaTime, sprintSpeed);
             else
             {
-                if(horizontalSpeed > moveSpeed)
+                if (horizontalSpeed > moveSpeed)
                     horizontalSpeed = Mathf.Min(horizontalSpeed, sprintSpeed) - acclerationStrenth * Time.fixedDeltaTime;
                 else
                     horizontalSpeed = Mathf.Min(horizontalSpeed + acclerationStrenth * Time.fixedDeltaTime, moveSpeed);
             }
-        }  
+        }
 
         Vector3 direction = Vector3.zero;
-        if(rawDirection.sqrMagnitude > 0f)
+        if (rawDirection.sqrMagnitude > 0f)
         {
             float targetAngle = Mathf.Atan2(rawDirection.x, rawDirection.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
             direction = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
@@ -158,12 +177,19 @@ public class PlayerController : MonoBehaviour
         controller.Move(direction * horizontalSpeed * Time.fixedDeltaTime + Vector3.up * verticalSpeed * Time.fixedDeltaTime);
     }
 
+    public void SetPosition(Vector3 position)
+    {
+        this.controller.enabled = false;
+        transform.position = position;
+        this.controller.enabled = true;
+    }
+
     private void Rotation()
     {
-        if(rawDirection.sqrMagnitude > 0f)
+        if (rawDirection.sqrMagnitude > 0f)
         {
             float targetAngle = Mathf.Atan2(rawDirection.x, rawDirection.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0,targetAngle,0), rotateStrenth);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, targetAngle, 0), rotateStrenth);
         }
     }
 }
