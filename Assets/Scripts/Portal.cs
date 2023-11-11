@@ -2,6 +2,7 @@ using System.Linq;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using Bogay.SceneAudioManager;
 
 public class Portal : MonoBehaviour
 {
@@ -37,10 +38,10 @@ public class Portal : MonoBehaviour
             return;
         }
 
-        // TODO: VFX, dispose
         var delta = Random.onUnitSphere * 2;
         delta.y = 0;
         player.SetPosition(anotherPortal.transform.position + delta);
+        SceneAudioManager.instance.PlayByName("Portal");
         Destroy(gameObject);
     }
 }

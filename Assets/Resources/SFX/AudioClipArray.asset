@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1efe4e21df5d74e89c5cf35d47d76f, type: 3}
+  m_Name: AudioClipArray
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: Portal
+    clip: {fileID: 8300000, guid: 3f72d670fbb05034ea7bee607cbccca4, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0

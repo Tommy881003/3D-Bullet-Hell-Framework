@@ -821,6 +821,51 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!1 &864003946
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 864003948}
+  - component: {fileID: 864003947}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &864003947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864003946}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce82340813b0a274abbdd77616b699c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneClipArray: {fileID: 11400000, guid: c3a82ba58a0ab214d87f2460d06bea32, type: 2}
+--- !u!4 &864003948
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 864003946}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.0674937, y: 0.2648759, z: 0.6304846}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2912438818379486506}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &875015576
 GameObject:
   m_ObjectHideFlags: 3
@@ -2196,7 +2241,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2710568487981737405, guid: bb085dbbc034118498c2e2a72a46ee57,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 864003948}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3374901468320808711, guid: bb085dbbc034118498c2e2a72a46ee57,
         type: 3}
@@ -2236,6 +2285,12 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!4 &2912438818379486506 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2710568487981737405, guid: bb085dbbc034118498c2e2a72a46ee57,
+    type: 3}
+  m_PrefabInstance: {fileID: 2912438818379486494}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3647907395850523900
 PrefabInstance:
   m_ObjectHideFlags: 0
