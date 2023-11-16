@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using VContainer;
+using SpellBound.Combat;
+using SpellBound.Core;
 
 public class PlayerController : MonoBehaviour
 {
@@ -21,6 +23,12 @@ public class PlayerController : MonoBehaviour
     private float jumpHeight = 2.25f;
     [SerializeField, ShowOnly]
     private float gravity = -15.0f;
+
+    [Space(10)]
+    [SerializeField]
+    private MainWeapon mainWeapon;
+    [SerializeField]
+    private Character character;
 
     [Space(10)]
     [SerializeField, ShowOnly, Tooltip("Time required to pass before being able to jump again")]
@@ -61,6 +69,8 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         mainCamera = Camera.main.transform;
+        Cursor.lockState = CursorLockMode.Locked;
+        this.character.Init();
     }
 
     void Update()
@@ -78,18 +88,18 @@ public class PlayerController : MonoBehaviour
 
     private void DetectKeyDown()
     {
-        #region Jump
-
         if (Input.GetKeyDown(KeyCode.Space) && canJump)
         {
             // the square root of H * -2 * G = how much speed needed to reach desired height
             verticalSpeed = Mathf.Sqrt(jumpHeight * -2f * gravity);
             jumpCooldown = jumpTimeout;
         }
+
         if (Input.GetKeyDown(KeyCode.V))
             this.createPortal();
 
-        #endregion
+        if (Input.GetMouseButtonDown(0))
+            this.mainWeapon.Shoot(this.mainCamera.forward);
     }
 
     private void DetectKey()

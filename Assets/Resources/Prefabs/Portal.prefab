@@ -98,6 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dac4c25ec0c8a1044a4d0c0fe04361fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  afterTeloportedVFX: {fileID: 8926484042661614526, guid: a4e02fdf34c1c97489e2f74ab0b95793,
+    type: 3}
   yOffset: 1.5
 --- !u!135 &6560699261679038966
 SphereCollider:
