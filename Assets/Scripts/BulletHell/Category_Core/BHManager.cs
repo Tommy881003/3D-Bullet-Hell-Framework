@@ -127,6 +127,7 @@ namespace BulletHell3D
                             {
                                 // Bullet hit player
                                 Debug.Log("Hit player");
+
                             }
                         }
                         i++;

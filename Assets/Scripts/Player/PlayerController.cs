@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using VContainer;
 using SpellBound.Combat;
+using SpellBound.Core;
 
 public class PlayerController : MonoBehaviour
 {
@@ -26,6 +27,8 @@ public class PlayerController : MonoBehaviour
     [Space(10)]
     [SerializeField]
     private MainWeapon mainWeapon;
+    [SerializeField]
+    private Character character;
 
     [Space(10)]
     [SerializeField, ShowOnly, Tooltip("Time required to pass before being able to jump again")]
@@ -67,6 +70,7 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         mainCamera = Camera.main.transform;
         Cursor.lockState = CursorLockMode.Locked;
+        this.character.Init();
     }
 
     void Update()
