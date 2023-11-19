@@ -9,6 +9,7 @@ namespace BulletHell3D
     // 2. Auto-destroy once there are no bullet left. (That is, if you create a transformUpdater with no bullets, it'll auto-destroy very soon.)
     public class BHTransformUpdater : MonoBehaviour, IBHBulletUpdater
     {
+        public Guid groupId;
         public List<BHBullet> bullets { get; protected set; } = new List<BHBullet>();
         protected List<Vector3> localPos = new List<Vector3>();
 
@@ -35,11 +36,14 @@ namespace BulletHell3D
             transform.position = position;
             transform.rotation = Quaternion.LookRotation(relativeForward, relativeUp);*/
             transform.localScale = Vector3.zero;
-            if(mainPattern != null)
+            if (mainPattern != null)
             {
-                foreach(Vector3 pos in mainPattern.bullets)
+                foreach (Vector3 pos in mainPattern.bullets)
                 {
-                    bullets.Add(new BHBullet(transform.TransformPoint(pos), mainPattern.renderObject));
+                    bullets.Add(new BHBullet(
+                        transform.TransformPoint(pos),
+                        mainPattern.renderObject,
+                        this.groupId));
                     localPos.Add(pos);
                 }
             }
@@ -51,9 +55,9 @@ namespace BulletHell3D
 
         public void UpdateBullets(float deltaTime)
         {
-            for(int i = 0 ; i < bullets.Count; i ++)
+            for (int i = 0; i < bullets.Count; i++)
                 bullets[i].SetPosition(transform.TransformPoint(localPos[i]));
-            if(bullets.Count == 0)
+            if (bullets.Count == 0)
                 Destroy(gameObject);
         }
 
@@ -74,12 +78,12 @@ namespace BulletHell3D
         /// </summary>
         public void SetPattern(BHPattern pattern)
         {
-            if(!canSetPattern)
+            if (!canSetPattern)
                 BHExceptionRaiser.RaiseException(BHException.SetupAfterInitialization);
             mainPattern = pattern;
         }
 
-        private void OnDestroy() 
+        private void OnDestroy()
         {
             DestroyUpdater();
         }

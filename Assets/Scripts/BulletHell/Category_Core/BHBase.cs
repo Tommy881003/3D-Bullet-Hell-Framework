@@ -15,11 +15,15 @@ namespace BulletHell3D
         public bool isAlive = true;
         public BHRenderObject renderObject;
 
-        public BHBullet(Vector3 pos, BHRenderObject render)
+        public System.Guid groupId;
+
+        public BHBullet(Vector3 pos, BHRenderObject render, System.Guid? groupId = null)
         {
             position = pos;
             renderObject = render;
             //CalculateOrthos(direction);
+            if (groupId != null)
+                this.groupId = groupId.Value;
         }
 
         public void SetPosition(Vector3 newPos)

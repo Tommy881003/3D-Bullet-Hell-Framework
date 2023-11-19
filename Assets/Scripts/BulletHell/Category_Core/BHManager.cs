@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
+using MessagePipe;
+using VContainer.Unity;
+using MessagePipe.VContainer;
+using VContainer;
 
 namespace BulletHell3D
 {
@@ -24,6 +28,9 @@ namespace BulletHell3D
         private LayerMask collisionMask;
         private LayerMask obstacleMask;
         private LayerMask playerMask;
+
+        [Inject]
+        private readonly IPublisher<System.Guid, CollisionEvent> collisionPublisher;
 
         #region BulletUpdater
 
@@ -114,21 +121,28 @@ namespace BulletHell3D
                         if (bulletResults[i].collider != null)
                         {
                             int colliderLayer = 1 << (bulletResults[i].collider.gameObject.layer);
-
                             bullet.isAlive = false;
+                            // play particle system on collision
                             if (useParticle)
                                 BHParticlePool.instance.RequestParticlePlay(bulletResults[i].point);
-
-                            if ((colliderLayer & obstacleMask) != 0)
+                            this.collisionPublisher.Publish(bullet.groupId, new CollisionEvent
                             {
-                                // Bullet hit obstacle
-                            }
-                            if ((colliderLayer & playerMask) != 0)
-                            {
-                                // Bullet hit player
-                                Debug.Log("Hit player");
+                                bullet = bullet,
+                                contact = bulletResults[i].collider.gameObject,
+                                hit = bulletResults[i],
+                            });
 
-                            }
+                            // // TODO: maybe generalize collision event?
+                            // if ((colliderLayer & obstacleMask) != 0)
+                            // {
+                            //     // Bullet hit obstacle
+                            // }
+                            // if ((colliderLayer & playerMask) != 0)
+                            // {
+                            //     // Bullet hit player
+                            //     Debug.Log("Hit player");
+
+                            // }
                         }
                         i++;
                     }
