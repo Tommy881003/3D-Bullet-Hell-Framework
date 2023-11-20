@@ -17,11 +17,9 @@ public class MainLifetimeScope : LifetimeScope
     {
         builder.RegisterInstance(this.portalPrefab);
         builder.Register<PortalRepository>(Lifetime.Singleton);
-        builder.RegisterComponentInHierarchy<BHManager>();
         builder.RegisterBuildCallback(container =>
         {
             container.InjectGameObject(player);
-            container.InjectGameObject(FindObjectOfType<BHManager>().gameObject);
         });
         // setup MessagePipe
         // see more: https://github.com/Cysharp/MessagePipe#unity
@@ -29,7 +27,5 @@ public class MainLifetimeScope : LifetimeScope
         var options = builder.RegisterMessagePipe();
         builder.RegisterBuildCallback(c => GlobalMessagePipe.SetProvider(c.AsServiceProvider()));
         builder.RegisterMessageBroker<System.Guid, CollisionEvent>(options);
-
-        // also exists RegisterMessageBroker<TKey, TMessage>, RegisterRequestHandler, RegisterAsyncRequestHandler
     }
 }

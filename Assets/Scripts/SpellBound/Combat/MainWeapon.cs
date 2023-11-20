@@ -49,7 +49,6 @@ namespace SpellBound.Combat
             updater.groupId = this.groupId;
             updater.SetPattern(this.pattern);
 
-
             while (go != null)
             {
                 go.transform.position += forward * (this.speed * Time.deltaTime);

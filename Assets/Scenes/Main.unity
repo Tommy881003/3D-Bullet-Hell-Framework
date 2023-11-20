@@ -2328,6 +2328,12 @@ PrefabInstance:
       propertyPath: mainWeapon
       value: 
       objectReference: {fileID: 781974896}
+    - target: {fileID: 3374901468320808708, guid: bb085dbbc034118498c2e2a72a46ee57,
+        type: 3}
+      propertyPath: <Character>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: 20e5c6ed53f4eb24bbda3042f690f52f,
+        type: 2}
     - target: {fileID: 3374901468320808711, guid: bb085dbbc034118498c2e2a72a46ee57,
         type: 3}
       propertyPath: m_Name
@@ -2471,7 +2477,7 @@ PrefabInstance:
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
       propertyPath: autoInjectGameObjects.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
@@ -2483,6 +2489,11 @@ PrefabInstance:
       propertyPath: autoInjectGameObjects.Array.data[1]
       value: 
       objectReference: {fileID: 1894618509}
+    - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
+        type: 3}
+      propertyPath: autoInjectGameObjects.Array.data[2]
+      value: 
+      objectReference: {fileID: 298276280}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
