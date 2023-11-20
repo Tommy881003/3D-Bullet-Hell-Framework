@@ -27,9 +27,13 @@ namespace SpellBound.Combat
             Debug.Log($"main weapon guid: {this.groupId}");
             this.subscriber.Subscribe(this.groupId, evt =>
             {
-                if (((1 << evt.contact.layer) & CollisionGroups.instance.obstacleMask) != 0)
+                var layer = 1 << evt.contact.layer;
+                // TODO: make it usable on enemy (i.e. don't hard-coded enemy mask / owner)
+                if ((layer & CollisionGroups.instance.enemyMask) != 0)
                 {
-                    Debug.Log("Hit obstacle");
+                    Debug.Log("Hit enemy");
+                    var controller = evt.contact.GetComponent<EnemyController>();
+                    controller.character.Hurt(1);
                 }
             });
         }
@@ -41,7 +45,7 @@ namespace SpellBound.Combat
 
         private IEnumerator shootCoro(Vector3 forward)
         {
-            var go = new GameObject("PlayerBullet");
+            var go = new GameObject("Bullet");
 
             go.transform.position = transform.position + forward * distance;
             go.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);

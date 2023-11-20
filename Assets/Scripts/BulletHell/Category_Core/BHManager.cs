@@ -75,7 +75,7 @@ namespace BulletHell3D
             CollisionGroups collisionGroups = CollisionGroups.instance;
             obstacleMask = collisionGroups.obstacleMask;
             playerMask = collisionGroups.playerMask;
-            collisionMask = obstacleMask | playerMask;
+            collisionMask = obstacleMask | playerMask | collisionGroups.enemyMask;
 
             // Initialize rendering params.
             renderGroups = new BHRenderGroup[renderObjects.Length];
