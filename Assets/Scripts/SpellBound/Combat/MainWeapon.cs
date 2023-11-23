@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Bogay.SceneAudioManager;
 using BulletHell3D;
 using MessagePipe;
+using SpellBound.BulletHell;
 using UnityEngine;
 using VContainer;
 
@@ -11,6 +13,10 @@ namespace SpellBound.Combat
     {
         [SerializeField]
         private BHPattern pattern;
+        [SerializeField]
+        private GameObject vfxPrefab;
+        [SerializeField]
+        private string sfxName;
         // TODO: maybe use DI to collect these config in one place?
         [SerializeField]
         private float distance;
@@ -33,7 +39,7 @@ namespace SpellBound.Combat
                 {
                     Debug.Log("Hit enemy");
                     var controller = evt.contact.GetComponent<EnemyController>();
-                    controller.character.Hurt(1);
+                    controller.character.Hurt(30);
                 }
             });
         }
@@ -49,9 +55,12 @@ namespace SpellBound.Combat
 
             go.transform.position = transform.position + forward * distance;
             go.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
-            var updater = go.AddComponent<BHTransformUpdater>();
+            var updater = go.AddComponent<BHTransformVFXUpdater>();
             updater.groupId = this.groupId;
             updater.SetPattern(this.pattern);
+            updater.vfxPrefab = this.vfxPrefab;
+
+            SceneAudioManager.instance.PlayByName(this.sfxName);
 
             while (go != null)
             {

@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     [Space(10)]
     [SerializeField]
     private MainWeapon mainWeapon;
+    [SerializeField]
+    private MainWeapon secondWeapon;
     [field: SerializeField]
     public Character Character { get; private set; }
 
@@ -100,6 +102,8 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
             this.mainWeapon.Shoot(this.mainCamera.forward);
+        else if (Input.GetMouseButtonDown(1))
+            this.secondWeapon.Shoot(this.mainCamera.forward);
     }
 
     private void DetectKey()
