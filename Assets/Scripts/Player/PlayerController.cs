@@ -28,7 +28,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private MainWeapon mainWeapon;
     [SerializeField]
-    private Character character;
+    private MainWeapon secondWeapon;
+    [field: SerializeField]
+    public Character Character { get; private set; }
 
     [Space(10)]
     [SerializeField, ShowOnly, Tooltip("Time required to pass before being able to jump again")]
@@ -70,7 +72,7 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         mainCamera = Camera.main.transform;
         Cursor.lockState = CursorLockMode.Locked;
-        this.character.Init();
+        this.Character.Init();
     }
 
     void Update()
@@ -100,6 +102,8 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
             this.mainWeapon.Shoot(this.mainCamera.forward);
+        else if (Input.GetMouseButtonDown(1))
+            this.secondWeapon.Shoot(this.mainCamera.forward);
     }
 
     private void DetectKey()

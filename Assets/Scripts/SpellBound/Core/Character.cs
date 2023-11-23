@@ -28,5 +28,10 @@ namespace SpellBound.Core
             this.MP = this.MaxMP.Value();
             this.Power = new Stats(this.power);
         }
+
+        public void Hurt(int damage)
+        {
+            this.HP -= damage;
+        }
     }
 }

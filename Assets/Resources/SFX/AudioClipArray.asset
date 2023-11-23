@@ -18,3 +18,13 @@ MonoBehaviour:
     volume: 1
     pitch: 1
     loop: 0
+  - name: EnemyDeath
+    clip: {fileID: 8300000, guid: c560ee8603c0e5640ad7c718087fb53c, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0
+  - name: Attack2
+    clip: {fileID: 8300000, guid: 5ca3af7b67cbb2d4c95f55f1f8a7b317, type: 3}
+    volume: 1
+    pitch: 1
+    loop: 0

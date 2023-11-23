@@ -9,6 +9,7 @@ namespace BulletHell3D
     // 2. Does not auto-destroy (even when it has no bullets), must call Destroy manually.
     public class BHCustomUpdater : MonoBehaviour, IBHBulletUpdater
     {
+        public System.Guid? groupId;
         public List<BHBullet> bullets { get; protected set; } = new List<BHBullet>();
         protected List<Vector3> forwards = new List<Vector3>();
         private Queue<BHBullet> addQueue = new Queue<BHBullet>();
@@ -24,14 +25,14 @@ namespace BulletHell3D
 
         public void UpdateBullets(float deltaTime)
         {
-            while(addQueue.Count > 0)
+            while (addQueue.Count > 0)
             {
                 var bullet = addQueue.Dequeue();
                 bullets.Add(bullet);
             }
 
             UpdateCustom(deltaTime);
-        }        
+        }
 
         public virtual void RemoveBullets()
         {
@@ -70,17 +71,21 @@ namespace BulletHell3D
         // So, after knowing the cause of error, the solution would be simple.
         // When adding bullets (step 4), we delayed the request till the collision checking process is completed. (AFTER step 1 is done)
         */
-        public void AddBullet(BHRenderObject renderObject, Vector3 position, Vector3 forward)
+        public void AddBullet(
+            BHRenderObject renderObject,
+            Vector3 position,
+            Vector3 forward,
+            System.Guid? groupId = null)
         {
-            addQueue.Enqueue(new BHBullet(position, renderObject));
+            addQueue.Enqueue(new BHBullet(position, renderObject, groupId ?? this.groupId));
             forwards.Add(forward);
         }
 
-        protected virtual void UpdateCustom(float deltaTime) {}
+        protected virtual void UpdateCustom(float deltaTime) { }
 
-        private void OnDestroy() 
+        private void OnDestroy()
         {
-            DestroyUpdater();    
+            DestroyUpdater();
         }
     }
 }

@@ -1,17 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using BulletHell3D;
 
-namespace BulletHell3D
+namespace SpellBound.BulletHell
 {
-    // Memo: Behaviour of BHTransformUpdater
-    // 1. CANNOT add bullets once initialized.
-    // 2. Auto-destroy once there are no bullet left. (That is, if you create a transformUpdater with no bullets, it'll auto-destroy very soon.)
-    public class BHTransformUpdater : MonoBehaviour, IBHBulletUpdater
+    public class BHTransformVFXUpdater : MonoBehaviour, IBHBulletUpdater
     {
         public Guid groupId;
         public List<BHBullet> bullets { get; protected set; } = new List<BHBullet>();
+        private List<GameObject> vfxList = new List<GameObject>();
         protected List<Vector3> localPos = new List<Vector3>();
+
+        [SerializeField]
+        public GameObject vfxPrefab;
 
         private bool canSetPattern = true;
         [SerializeField]
@@ -22,19 +24,6 @@ namespace BulletHell3D
             canSetPattern = false;
             InitUpdater();
 
-            // Orthonormal vectors in relative coordinate.
-            // Forward: z-axis
-            // Right: x-axis
-            // Up: y-axis
-            /*Vector3 relativeForward;
-            Vector3 relativeRight;
-            Vector3 relativeUp;
-            
-            relativeForward = forwardAxis.normalized;
-            BHHelper.LookRotationSolver(forwardAxis, angleInDeg, out relativeUp, out relativeRight);
-
-            transform.position = position;
-            transform.rotation = Quaternion.LookRotation(relativeForward, relativeUp);*/
             transform.localScale = Vector3.zero;
             if (mainPattern != null)
             {
@@ -44,6 +33,7 @@ namespace BulletHell3D
                         transform.TransformPoint(pos),
                         mainPattern.renderObject,
                         this.groupId));
+                    vfxList.Add(Instantiate(this.vfxPrefab, pos, Quaternion.identity));
                     localPos.Add(pos);
                 }
             }
@@ -56,14 +46,27 @@ namespace BulletHell3D
         public void UpdateBullets(float deltaTime)
         {
             for (int i = 0; i < bullets.Count; i++)
+            {
                 bullets[i].SetPosition(transform.TransformPoint(localPos[i]));
+                vfxList[i].transform.position = transform.TransformPoint(localPos[i]);
+                vfxList[i].transform.forward = bullets[i].delta;
+            }
             if (bullets.Count == 0)
                 Destroy(gameObject);
         }
 
         public void RemoveBullets()
         {
-            BHUpdaterHelper.DefaultRemoveBullets(this, ref localPos);
+            for (int i = bullets.Count - 1; i >= 0; i--)
+            {
+                if (!bullets[i].isAlive)
+                {
+                    bullets.RemoveAt(i);
+                    localPos.RemoveAt(i);
+                    Destroy(vfxList[i]);
+                    vfxList.RemoveAt(i);
+                }
+            }
         }
 
         public void DestroyUpdater()
