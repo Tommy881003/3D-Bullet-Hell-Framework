@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1424108225791410361}
   - component: {fileID: 7820032875607281853}
   - component: {fileID: 7077013521559319229}
-  m_Layer: 0
+  m_Layer: 30
   m_Name: MainWeaponVFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -131,18 +131,6 @@ namespace BulletHell3D
                                 contact = bulletResults[i].collider.gameObject,
                                 hit = bulletResults[i],
                             });
-
-                            // // TODO: maybe generalize collision event?
-                            // if ((colliderLayer & obstacleMask) != 0)
-                            // {
-                            //     // Bullet hit obstacle
-                            // }
-                            // if ((colliderLayer & playerMask) != 0)
-                            // {
-                            //     // Bullet hit player
-                            //     Debug.Log("Hit player");
-
-                            // }
                         }
                         i++;
                     }
@@ -364,7 +352,7 @@ namespace BulletHell3D
                         group.batches[i].propertyBlock,
                         UnityEngine.Rendering.ShadowCastingMode.Off,
                         false,
-                        renderMask
+                        30
                     );
                 }
             }

@@ -47,9 +47,11 @@ namespace SpellBound.BulletHell
         {
             for (int i = 0; i < bullets.Count; i++)
             {
-                bullets[i].SetPosition(transform.TransformPoint(localPos[i]));
-                vfxList[i].transform.position = transform.TransformPoint(localPos[i]);
-                vfxList[i].transform.forward = bullets[i].delta;
+                Vector3 bulletPos = transform.TransformPoint(localPos[i]);
+                bullets[i].SetPosition(bulletPos);
+                vfxList[i].transform.position = bulletPos;
+                if (bullets[i].delta.sqrMagnitude > float.Epsilon)
+                    vfxList[i].transform.forward = bullets[i].delta;
             }
             if (bullets.Count == 0)
                 Destroy(gameObject);
