@@ -14,6 +14,7 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
+        this.character = ScriptableObject.Instantiate(this.character);
         this.character.Init();
     }
 
