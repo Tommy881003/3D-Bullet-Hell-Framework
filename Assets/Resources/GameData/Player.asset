@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHP: 100
   maxMP: 100
-  power: 10
+  power: 1

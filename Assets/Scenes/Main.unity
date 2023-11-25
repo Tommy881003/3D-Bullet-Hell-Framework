@@ -2522,18 +2522,18 @@ PrefabInstance:
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
       propertyPath: autoInjectGameObjects.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
       propertyPath: autoInjectGameObjects.Array.data[0]
       value: 
-      objectReference: {fileID: 2912438818379486495}
+      objectReference: {fileID: 1894618509}
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
       propertyPath: autoInjectGameObjects.Array.data[1]
       value: 
-      objectReference: {fileID: 1894618509}
+      objectReference: {fileID: 298276280}
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
       propertyPath: autoInjectGameObjects.Array.data[2]

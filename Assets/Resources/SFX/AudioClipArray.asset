@@ -15,7 +15,7 @@ MonoBehaviour:
   sounds:
   - name: Portal
     clip: {fileID: 8300000, guid: 3f72d670fbb05034ea7bee607cbccca4, type: 3}
-    volume: 1
+    volume: 0.5
     pitch: 1
     loop: 0
   - name: EnemyDeath

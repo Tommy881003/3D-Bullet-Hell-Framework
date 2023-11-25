@@ -4,6 +4,7 @@ using Bogay.SceneAudioManager;
 using BulletHell3D;
 using MessagePipe;
 using SpellBound.BulletHell;
+using SpellBound.Core;
 using UnityEngine;
 using VContainer;
 
@@ -17,6 +18,7 @@ namespace SpellBound.Combat
         private GameObject vfxPrefab;
         [SerializeField]
         private string sfxName;
+
         // TODO: maybe use DI to collect these config in one place?
         [SerializeField]
         private float distance;
@@ -24,8 +26,11 @@ namespace SpellBound.Combat
         private float speed;
 
         private System.Guid groupId;
+
         [Inject]
         private readonly ISubscriber<System.Guid, CollisionEvent> subscriber;
+        [Inject]
+        private readonly Character owner;
 
         private void Start()
         {
@@ -39,7 +44,7 @@ namespace SpellBound.Combat
                 {
                     Debug.Log("Hit enemy");
                     var controller = evt.contact.GetComponent<EnemyController>();
-                    controller.character.Hurt(30);
+                    controller.character.Hurt(this.owner.Power.Value());
                 }
             });
         }
