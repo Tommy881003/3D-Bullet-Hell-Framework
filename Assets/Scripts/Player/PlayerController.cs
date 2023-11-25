@@ -53,8 +53,8 @@ public class PlayerController : MonoBehaviour
     private Animator animator;
 
     // player
-    private float horizontalSpeed;
-    private float verticalSpeed;
+    public float horizontalSpeed { get; private set; }
+    public float verticalSpeed { get; private set; }
     private Vector3 rawDirection = Vector3.zero;
 
     // timer
@@ -90,7 +90,6 @@ public class PlayerController : MonoBehaviour
         GroundCheck();
         Rotation();
         Move();
-        SyncAnimatorParameters();
     }
 
     private void DetectKeyDown()
@@ -210,10 +209,5 @@ public class PlayerController : MonoBehaviour
             float targetAngle = Mathf.Atan2(rawDirection.x, rawDirection.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, targetAngle, 0), rotateStrenth);
         }
-    }
-
-    private void SyncAnimatorParameters()
-    {
-        this.animator.SetFloat("Velocity", this.horizontalSpeed);
     }
 }
