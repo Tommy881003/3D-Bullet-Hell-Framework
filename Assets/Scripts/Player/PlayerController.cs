@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-using VContainer;
+﻿using UnityEngine;
 using SpellBound.Combat;
 using SpellBound.Core;
 using Cysharp.Threading.Tasks;
@@ -71,9 +67,6 @@ public class PlayerController : MonoBehaviour
     private CharacterController controller;
     private Transform mainCamera;
 
-    [Inject]
-    private PortalRepository portalRepository;
-
     private void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -137,19 +130,6 @@ public class PlayerController : MonoBehaviour
             rawDirection += Vector3.left;
         if (Input.GetKey(KeyCode.D))
             rawDirection += Vector3.right;
-    }
-
-    private void createPortal()
-    {
-        Debug.Assert(this.portalRepository != null);
-
-        float distance = 10;
-        Vector3 spawnDelta = mainCamera.forward;
-        spawnDelta.y = 0;
-        spawnDelta.Normalize();
-        spawnDelta *= distance;
-
-        var portal = this.portalRepository.Create(transform.position + spawnDelta);
     }
 
     private void GroundCheck()
