@@ -2619,25 +2619,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 3374901468320808708, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: secondWeapon
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 3374901468320808711, guid: bb085dbbc034118498c2e2a72a46ee57,
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3847229353622065425, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: skillTriggerSetting.<Cost>k__BackingField
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3847229353622065425, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: skillTriggerSetting.<CooldownSeconds>k__BackingField
-      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 6162477930549991595, guid: bb085dbbc034118498c2e2a72a46ee57,
         type: 3}

@@ -27,10 +27,14 @@ public class PlayerController : MonoBehaviour
     private float gravity = -15.0f;
 
     [Space(10)]
+    [Header("Ability")]
     [SerializeField]
     private MainWeapon mainWeapon;
     [SerializeField]
     private MainWeapon secondWeapon;
+    [SerializeField]
+    private Dash dash;
+
     [field: SerializeField]
     public Character Character { get; private set; }
 
@@ -50,14 +54,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField, ShowOnly, Tooltip("What layers the character uses as ground")]
     private LayerMask groundLayers;
 
-    [Space(10)]
-    [SerializeField]
-    private Animator animator;
-
     // player
     public float horizontalSpeed { get; private set; }
     public float verticalSpeed { get; private set; }
     private Vector3 rawDirection = Vector3.zero;
+    private Vector3 moveDirection = Vector3.zero;
 
     // timer
     private float jumpCooldown = 0;
@@ -110,6 +111,9 @@ public class PlayerController : MonoBehaviour
             this.mainWeapon.Shoot(this.mainCamera.forward);
         else if (Input.GetMouseButtonDown(1))
             this.secondWeapon.Shoot(this.mainCamera.forward);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+            this.dash.Cast(this.moveDirection);
     }
 
     private async UniTaskVoid CharacterRegen(CancellationToken ct)
@@ -195,16 +199,16 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        Vector3 direction = Vector3.zero;
+        moveDirection = Vector3.zero;
         if (rawDirection.sqrMagnitude > 0f)
         {
             float targetAngle = Mathf.Atan2(rawDirection.x, rawDirection.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
-            direction = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
+            moveDirection = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
         }
 
         #endregion
 
-        controller.Move(direction * horizontalSpeed * Time.fixedDeltaTime + Vector3.up * verticalSpeed * Time.fixedDeltaTime);
+        controller.Move(moveDirection * horizontalSpeed * Time.fixedDeltaTime + Vector3.up * verticalSpeed * Time.fixedDeltaTime);
     }
 
     public void SetPosition(Vector3 position)

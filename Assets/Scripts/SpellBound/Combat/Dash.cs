@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+using SpellBound.Combat;
 using SpellBound.Core;
 using UnityEngine;
 using VContainer;
@@ -8,28 +10,39 @@ public class Dash : MonoBehaviour
 {
     [SerializeField]
     private float distance;
-    [SerializeField]
-    public int Cost { get; private set; }
+
+    [field: SerializeField]
+    public SkillTriggerSetting skillTriggerSetting { get; private set; }
+    private SkillTrigger<Vector3> skillTrigger;
+
+    // TODO: DI
     [SerializeField]
     private PlayerController playerController;
 
     [Inject]
     private readonly Character owner;
 
-    // Start is called before the first frame update
     void Start()
     {
+        this.skillTrigger = new SkillTrigger<Vector3>(
+            this.skillTriggerSetting,
+            this.owner
+        );
 
-    }
+        this.skillTrigger.Subscribe(fwd =>
+        {
+            var stopsAt = this.playerController.transform.position + fwd * this.distance;
+            this.playerController.SetPosition(stopsAt);
+        });
 
-    // Update is called once per frame
-    void Update()
-    {
-
+        var ct = this.GetCancellationTokenOnDestroy();
+        this.skillTrigger.Start(ct);
     }
 
     public void Cast(Vector3 forward)
     {
-
+        forward.y = 0;
+        forward = forward.normalized;
+        this.skillTrigger.Trigger(forward);
     }
 }
