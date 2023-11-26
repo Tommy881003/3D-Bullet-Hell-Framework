@@ -2619,35 +2619,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3374901468320808708, guid: bb085dbbc034118498c2e2a72a46ee57,
+        type: 3}
+      propertyPath: secondWeapon
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 3374901468320808711, guid: bb085dbbc034118498c2e2a72a46ee57,
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 3847229353622065425, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: distance
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3847229353622065425, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: cooldownSeconds
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3847229353622065425, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: <Cost>k__BackingField
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3847229353622065425, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: <ShootCooldownSeconds>k__BackingField
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 6162477930549991595, guid: bb085dbbc034118498c2e2a72a46ee57,
-        type: 3}
-      propertyPath: autoInjectGameObjects.Array.size
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6162477930549991595, guid: bb085dbbc034118498c2e2a72a46ee57,
         type: 3}
@@ -2738,6 +2718,12 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 2912438818379486495}
+    - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
+        type: 3}
+      propertyPath: gameConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: c9b1e339392173943b0ef1ef6b96ba95,
+        type: 2}
     - target: {fileID: 6161889009401589503, guid: 82cc798bcb00dac45b2bb299b4e02c3c,
         type: 3}
       propertyPath: portalPrefab

@@ -37,6 +37,8 @@ namespace SpellBound.Combat
         private readonly ISubscriber<System.Guid, CollisionEvent> subscriber;
         [Inject]
         private readonly Character owner;
+        [Inject]
+        private readonly CollisionGroups collisionGroups;
 
         private ISubscriber<Vector3> shootSubscriber;
         private IPublisher<Vector3> shootPublisher;
@@ -52,7 +54,7 @@ namespace SpellBound.Combat
             {
                 var layer = 1 << evt.contact.layer;
                 // TODO: make it usable on enemy (i.e. don't hard-coded enemy mask / owner)
-                if ((layer & CollisionGroups.instance.enemyMask) != 0)
+                if ((layer & this.collisionGroups.enemyMask) != 0)
                 {
                     Debug.Log("Hit enemy");
                     var controller = evt.contact.GetComponent<EnemyController>();

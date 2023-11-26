@@ -8,12 +8,17 @@ using BulletHell3D;
 public class MainLifetimeScope : LifetimeScope
 {
     [SerializeField]
+    private SpellBound.Config gameConfig;
+    [SerializeField]
     private GameObject portalPrefab;
 
     protected override void Configure(IContainerBuilder builder)
     {
         builder.RegisterInstance(this.portalPrefab);
         builder.Register<PortalRepository>(Lifetime.Singleton);
+        builder.RegisterInstance(this.gameConfig);
+        builder.RegisterInstance(this.gameConfig.CollisionGroups);
+
         // setup MessagePipe
         // see more: https://github.com/Cysharp/MessagePipe#unity
         // TODO: provide helper in BHManager?

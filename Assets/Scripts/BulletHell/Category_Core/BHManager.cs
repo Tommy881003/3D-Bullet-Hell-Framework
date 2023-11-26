@@ -31,6 +31,8 @@ namespace BulletHell3D
 
         [Inject]
         private readonly IPublisher<System.Guid, CollisionEvent> collisionPublisher;
+        [Inject]
+        private readonly CollisionGroups collisionGroups;
 
         #region BulletUpdater
 
@@ -72,10 +74,9 @@ namespace BulletHell3D
 
         public void Start()
         {
-            CollisionGroups collisionGroups = CollisionGroups.instance;
-            obstacleMask = collisionGroups.obstacleMask;
-            playerMask = collisionGroups.playerMask;
-            collisionMask = obstacleMask | playerMask | collisionGroups.enemyMask;
+            obstacleMask = this.collisionGroups.obstacleMask;
+            playerMask = this.collisionGroups.playerMask;
+            collisionMask = obstacleMask | playerMask | this.collisionGroups.enemyMask;
 
             // Initialize rendering params.
             renderGroups = new BHRenderGroup[renderObjects.Length];
