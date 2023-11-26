@@ -40,10 +40,8 @@ namespace SpellBound.Combat
         [Inject]
         private readonly CollisionGroups collisionGroups;
 
-        private ISubscriber<Vector3> shootSubscriber;
-        private IPublisher<Vector3> shootPublisher;
-
         private Vector3? shootDirection;
+        private float nextClearTime;
         public float ShootTimer { get; private set; }
 
         private void Start()
@@ -62,15 +60,23 @@ namespace SpellBound.Combat
                 }
             });
 
-            (this.shootPublisher, this.shootSubscriber) = GlobalMessagePipe.CreateEvent<Vector3>();
-            this.shootSubscriber.Subscribe(v =>
-            {
-                this.shootDirection = v;
-            });
-
+            this.nextClearTime = float.MaxValue;
             this.ShootTimer = this.ShootCooldownSeconds;
             var ct = this.GetCancellationTokenOnDestroy();
             this.shootTask(ct).Forget();
+            this.clearShootArgTask(ct).Forget();
+        }
+
+        private async UniTaskVoid clearShootArgTask(CancellationToken ct)
+        {
+            while (!ct.IsCancellationRequested)
+            {
+                if (Time.realtimeSinceStartup > this.nextClearTime)
+                {
+                    this.shootDirection = null;
+                }
+                await UniTask.Yield();
+            }
         }
 
         private async UniTaskVoid shootTask(CancellationToken ct)
@@ -102,13 +108,13 @@ namespace SpellBound.Combat
 
         public void Shoot(Vector3 forward)
         {
-            this.shootPublisher.Publish(forward);
+            this.shootDirection = forward;
+            this.nextClearTime = Time.realtimeSinceStartup + 0.05f;
         }
 
         private IEnumerator shootCoro(Vector3 forward)
         {
             var go = new GameObject("Bullet");
-
             go.transform.position = transform.position + forward * distance;
             go.transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
             var updater = go.AddComponent<BHTransformVFXUpdater>();
