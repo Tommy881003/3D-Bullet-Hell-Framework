@@ -5,6 +5,8 @@ using UnityEngine.Events;
 using VContainer;
 using SpellBound.Combat;
 using SpellBound.Core;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 public class PlayerController : MonoBehaviour
 {
@@ -77,6 +79,9 @@ public class PlayerController : MonoBehaviour
         mainCamera = Camera.main.transform;
         Cursor.lockState = CursorLockMode.Locked;
         this.Character.Init();
+
+        var ct = this.GetCancellationTokenOnDestroy();
+        this.CharacterRegen(ct).Forget();
     }
 
     void Update()
@@ -104,10 +109,20 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.V))
             this.createPortal();
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
             this.mainWeapon.Shoot(this.mainCamera.forward);
         else if (Input.GetMouseButtonDown(1))
             this.secondWeapon.Shoot(this.mainCamera.forward);
+    }
+
+    private async UniTaskVoid CharacterRegen(CancellationToken ct)
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            this.Character.Regen();
+            // delay 1s
+            await UniTask.Delay(1000);
+        }
     }
 
     private void DetectKey()

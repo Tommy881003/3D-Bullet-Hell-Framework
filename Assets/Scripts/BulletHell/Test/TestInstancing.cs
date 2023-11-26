@@ -27,11 +27,11 @@ public class TestInstancing : MonoBehaviour
         matrices = new Matrix4x4[batchCount][];
         positions = new Vector3[batchCount][];
 
-        for(int j = 0; j < batchCount; j++)
+        for (int j = 0; j < batchCount; j++)
         {
             matrices[j] = new Matrix4x4[1023];
             positions[j] = new Vector3[1023];
-            for(int i = 0; i < 1023 ; i++)
+            for (int i = 0; i < 1023; i++)
             {
                 Vector3 position = Random.insideUnitSphere * radius;
                 matrices[j][i] = Matrix4x4.TRS(Random.insideUnitSphere * radius, Quaternion.identity, Vector3.one);
@@ -42,7 +42,7 @@ public class TestInstancing : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(useJob)
+        if (useJob)
             JobRaycast();
         else
             NoJobRaycast();
@@ -50,15 +50,15 @@ public class TestInstancing : MonoBehaviour
 
     void NoJobRaycast()
     {
-        for(int j = 0; j < batchCount; j++)
+        for (int j = 0; j < batchCount; j++)
         {
-            for(int i = 0; i < 1023 ; i++)
+            for (int i = 0; i < 1023; i++)
             {
-                if(Physics.Raycast(positions[j][i],Vector3.forward,Time.fixedDeltaTime))
+                if (Physics.Raycast(positions[j][i], Vector3.forward, Time.fixedDeltaTime))
                     positions[j][i] = Random.insideUnitSphere * radius;
                 positions[j][i] += Vector3.forward * Time.fixedDeltaTime;
 
-                Vector4 column = (Vector4)positions[j][i] + new Vector4(0,0,0,1); 
+                Vector4 column = (Vector4)positions[j][i] + new Vector4(0, 0, 0, 1);
                 matrices[j][i].SetColumn(3, column);
             }
         }
@@ -74,11 +74,16 @@ public class TestInstancing : MonoBehaviour
         // Set the data of the first command
         Vector3 direction = Vector3.forward;
 
-        for(int j = 0; j < batchCount; j++)
-            for(int i = 0; i < 1023 ; i++)
-                commands[j * 1023 + i] = new SpherecastCommand(positions[j][i], 0.5f, direction, Time.fixedDeltaTime);
+        for (int j = 0; j < batchCount; j++)
+            for (int i = 0; i < 1023; i++)
+                commands[j * 1023 + i] = new SpherecastCommand(
+                    positions[j][i],
+                    0.5f,
+                    direction, new QueryParameters(),
+                    Time.fixedDeltaTime
+                );
 
-        
+
         // Schedule the batch of sphere casts
         var rayHandle = SpherecastCommand.ScheduleBatch(commands, results, 256, default(JobHandle));
 
@@ -86,15 +91,15 @@ public class TestInstancing : MonoBehaviour
         rayHandle.Complete();
 
         // Copy the result. If batchedHit.collider is null, there was no hit
-        for(int j = 0; j < batchCount; j++)
+        for (int j = 0; j < batchCount; j++)
         {
-            for(int i = 0; i < 1023 ; i++)
+            for (int i = 0; i < 1023; i++)
             {
-                if(results[j * 1023 + i].collider != null)
+                if (results[j * 1023 + i].collider != null)
                     positions[j][i] = Random.insideUnitSphere * radius;
                 positions[j][i] += Vector3.forward * Time.fixedDeltaTime;
 
-                Vector4 column = (Vector4)positions[j][i] + new Vector4(0,0,0,1); 
+                Vector4 column = (Vector4)positions[j][i] + new Vector4(0, 0, 0, 1);
                 matrices[j][i].SetColumn(3, column);
             }
         }
@@ -104,10 +109,10 @@ public class TestInstancing : MonoBehaviour
         commands.Dispose();
     }
 
-    void Update() 
+    void Update()
     {
-        for(int i = 0; i < batchCount; i ++)
-            Graphics.DrawMeshInstanced(mesh,0,material,matrices[i],1023, null, UnityEngine.Rendering.ShadowCastingMode.Off, false);
+        for (int i = 0; i < batchCount; i++)
+            Graphics.DrawMeshInstanced(mesh, 0, material, matrices[i], 1023, null, UnityEngine.Rendering.ShadowCastingMode.Off, false);
     }
 }
 
@@ -122,11 +127,11 @@ public struct PositionUpdateJob : IJobParallelFor
 
     public void Execute(int index)
     {
-        if(raycasts[index].collider != null)
-            positions[index] -= new Vector3(0,0,10);
-        positions[index] += new Vector3(0,0,deltaTime); 
+        if (raycasts[index].collider != null)
+            positions[index] -= new Vector3(0, 0, 10);
+        positions[index] += new Vector3(0, 0, deltaTime);
 
-        Vector4 column = (Vector4)positions[index] + new Vector4(0,0,0,1); 
+        Vector4 column = (Vector4)positions[index] + new Vector4(0, 0, 0, 1);
         matrices[index].SetColumn(3, column);
     }
 }
