@@ -106,9 +106,6 @@ public class PlayerController : MonoBehaviour
             jumpCooldown = jumpTimeout;
         }
 
-        if (Input.GetKeyDown(KeyCode.V))
-            this.createPortal();
-
         if (Input.GetMouseButton(0))
             this.mainWeapon.Shoot(this.mainCamera.forward);
         else if (Input.GetMouseButtonDown(1))
