@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SpellBound.Core
@@ -32,6 +30,16 @@ namespace SpellBound.Core
         public void Hurt(int damage)
         {
             this.HP -= damage;
+        }
+
+        public void Cast(int mp)
+        {
+            this.MP -= mp;
+        }
+
+        public void Regen()
+        {
+            this.MP = Mathf.Min(this.MP + 2, this.MaxMP.Value());
         }
     }
 }

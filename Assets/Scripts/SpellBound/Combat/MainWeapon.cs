@@ -22,6 +22,8 @@ namespace SpellBound.Combat
         private string sfxName;
         [field: SerializeField]
         public float ShootCooldownSeconds { get; private set; }
+        [field: SerializeField]
+        public int Cost { get; private set; }
 
         // TODO: maybe use DI to collect these config in one place?
         [SerializeField]
@@ -80,11 +82,17 @@ namespace SpellBound.Combat
                     continue;
                 }
 
+                if (this.owner.MP < this.Cost)
+                {
+                    continue;
+                }
+
                 if (this.shootDirection != null)
                 {
                     StartCoroutine(this.shootCoro(this.shootDirection.Value));
                     this.shootDirection = null;
                     this.ShootTimer = this.ShootCooldownSeconds;
+                    this.owner.Cast(this.Cost);
                 }
                 await UniTask.Yield();
             }
