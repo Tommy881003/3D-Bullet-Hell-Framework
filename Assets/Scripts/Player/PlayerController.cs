@@ -3,6 +3,7 @@ using SpellBound.Combat;
 using SpellBound.Core;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using Cinemachine;
 
 public class PlayerController : MonoBehaviour
 {
@@ -50,11 +51,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField, ShowOnly, Tooltip("What layers the character uses as ground")]
     private LayerMask groundLayers;
 
+    [Header("Camera control")]
+    [SerializeField]
+    private CinemachineFreeLook cinemachineFreeLook;
+
     // player
     public float horizontalSpeed { get; private set; }
     public float verticalSpeed { get; private set; }
     private Vector3 rawDirection = Vector3.zero;
     private Vector3 moveDirection = Vector3.zero;
+    private bool isControlled = false;
 
     // timer
     private float jumpCooldown = 0;
@@ -87,6 +93,7 @@ public class PlayerController : MonoBehaviour
     {
         DetectKey();
         GroundCheck();
+        CalculateSpeed();
         Rotation();
         Move();
     }
@@ -143,25 +150,24 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        #region Vertical Movement
-
-        if (grounded)
+        controller.Move(moveDirection * horizontalSpeed * Time.fixedDeltaTime + Vector3.up * verticalSpeed * Time.fixedDeltaTime);
+        if (this.isControlled)
         {
-            fallStateTimer = 0;
-            jumpCooldown -= Time.fixedDeltaTime;
-            if (verticalSpeed < 0)
-                verticalSpeed = 0;
+            // mainCamera.transform.Translate(moveDirection * horizontalSpeed * Time.fixedDeltaTime);
+            // this.cinemachineFreeLook.transform.Translate(moveDirection * horizontalSpeed * Time.fixedDeltaTime);
+            // mainCamera.transform.LookAt(this.cinemachineFreeLook.LookAt.transform.position, mainCamera.transform.up);
         }
-        else
-        {
-            fallStateTimer += Time.fixedDeltaTime;
-            jumpCooldown = jumpTimeout;
-            verticalSpeed += gravity * Time.fixedDeltaTime;
-        }
+    }
 
-        #endregion
+    private void CalculateSpeed()
+    {
+        CalculateVerticalSpeed();
+        CalculateHorizontalSpeed();
+    }
 
-        #region Horizontal Movement
+    private void CalculateHorizontalSpeed()
+    {
+        if (this.isControlled) return;
 
         if (rawDirection == Vector3.zero)
             horizontalSpeed = Mathf.Max(horizontalSpeed - acclerationStrenth * Time.fixedDeltaTime, 0);
@@ -179,16 +185,59 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        moveDirection = Vector3.zero;
-        if (rawDirection.sqrMagnitude > 0f)
+        this.moveDirection = CalculateMoveDirection(this.rawDirection);
+    }
+
+    private Vector3 CalculateMoveDirection(Vector3 direction)
+    {
+        var ret = Vector3.zero;
+        if (direction.sqrMagnitude > 0f)
         {
-            float targetAngle = Mathf.Atan2(rawDirection.x, rawDirection.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
-            moveDirection = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
+            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + mainCamera.eulerAngles.y;
+            ret = Quaternion.Euler(0, targetAngle, 0) * Vector3.forward;
         }
+        return ret;
+    }
 
-        #endregion
+    private void CalculateVerticalSpeed()
+    {
+        if (grounded)
+        {
+            fallStateTimer = 0;
+            jumpCooldown -= Time.fixedDeltaTime;
+            if (verticalSpeed < 0)
+                verticalSpeed = 0;
+        }
+        else
+        {
+            fallStateTimer += Time.fixedDeltaTime;
+            jumpCooldown = jumpTimeout;
+            verticalSpeed += gravity * Time.fixedDeltaTime;
+        }
+    }
 
-        controller.Move(moveDirection * horizontalSpeed * Time.fixedDeltaTime + Vector3.up * verticalSpeed * Time.fixedDeltaTime);
+    public async UniTaskVoid Dash(
+        Vector3 direction,
+         float duration = 0.1f,
+          CancellationToken cancellationToken = default)
+    {
+        direction.y = 0;
+
+        this.isControlled = true;
+        var oldHorizontalSpeed = this.horizontalSpeed;
+        var oldMoveDirection = this.moveDirection;
+        if (this.cinemachineFreeLook)
+            this.cinemachineFreeLook.enabled = false;
+
+        this.moveDirection = direction.normalized;
+        this.horizontalSpeed = direction.magnitude;
+        await UniTask.Delay(System.TimeSpan.FromSeconds(duration), cancellationToken: cancellationToken);
+
+        this.moveDirection = oldMoveDirection;
+        this.horizontalSpeed = oldHorizontalSpeed;
+        this.isControlled = false;
+        if (this.cinemachineFreeLook)
+            this.cinemachineFreeLook.enabled = true;
     }
 
     public void SetPosition(Vector3 position)

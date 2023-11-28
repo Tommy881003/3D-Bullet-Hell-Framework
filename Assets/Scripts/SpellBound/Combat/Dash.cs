@@ -9,7 +9,9 @@ using VContainer;
 public class Dash : MonoBehaviour
 {
     [SerializeField]
-    private float distance;
+    private float velocity;
+    [SerializeField]
+    private float duration;
 
     [field: SerializeField]
     public SkillTriggerSetting skillTriggerSetting { get; private set; }
@@ -29,13 +31,17 @@ public class Dash : MonoBehaviour
             this.owner
         );
 
+        var ct = this.GetCancellationTokenOnDestroy();
         this.skillTrigger.Subscribe(fwd =>
         {
-            var stopsAt = this.playerController.transform.position + fwd * this.distance;
-            this.playerController.SetPosition(stopsAt);
+            // var stopsAt = this.playerController.transform.position + fwd * this.distance;
+            // this.playerController.SetPosition(stopsAt);
+            this.playerController.Dash(
+                fwd * this.velocity,
+                duration: this.duration,
+                 cancellationToken: ct)
+                 .Forget();
         });
-
-        var ct = this.GetCancellationTokenOnDestroy();
         this.skillTrigger.Start(ct);
     }
 
