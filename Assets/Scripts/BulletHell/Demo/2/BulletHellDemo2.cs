@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BulletHell3D;
 using DG.Tweening;
+using Cysharp.Threading.Tasks.Triggers;
 
 public class BulletHellDemo2 : MonoBehaviour
 {
@@ -48,13 +49,18 @@ public class BulletHellDemo2 : MonoBehaviour
             objects[i].transform.localScale = Vector3.zero;
             var updater = objects[i].AddComponent<BHTransformUpdater>();
             updater.SetPattern(pattern);
-            objects[i].transform.DOScale(Vector3.one * (minRadius + i * radiusPerPattern), patternExpandTime);
+            objects[i].transform
+                .DOScale(Vector3.one * (minRadius + i * radiusPerPattern), patternExpandTime)
+                .SetLink(objects[i]);
             yield return new WaitForSeconds(spawnPatternGap);
         }
         yield return new WaitForSeconds(waitToDropTime);
         for (int i = 0; i < patternCount; i++)
         {
-            objects[i].transform.DOMoveY(0, dropTime).SetEase(dropEase);
+            objects[i].transform
+                .DOMoveY(0, dropTime)
+                .SetEase(dropEase)
+                .SetLink(objects[i]);
             yield return new WaitForSeconds(spawnPatternGap);
         }
     }

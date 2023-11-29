@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Collision Groups")]
-public class CollisionGroups : SingletonScriptableObject<CollisionGroups>
+public class CollisionGroups : ScriptableObject
 {
     // This is used to specify and categorize different "set" of objects. (For example: obstacles, player)
     // Feel free to add/modify/remove layermask by need.
