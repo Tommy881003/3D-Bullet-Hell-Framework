@@ -28,9 +28,10 @@ Transform:
   m_LocalPosition: {x: -6.355818, y: 4.1906686, z: 8.643005}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 5981310290753007484}
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6161889009401589503
 MonoBehaviour:
@@ -47,6 +48,59 @@ MonoBehaviour:
   parentReference:
     TypeName: 
   autoRun: 1
+  autoInjectGameObjects: []
+  gameConfig: {fileID: 11400000, guid: c9b1e339392173943b0ef1ef6b96ba95, type: 2}
+  portalPrefab: {fileID: 360066465906952177, guid: d628b7eb1a33ce04682d5cacff9cbba1,
+    type: 3}
+--- !u!1 &1178457658457192466
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5981310290753007484}
+  - component: {fileID: 2765331894517235458}
+  m_Layer: 0
+  m_Name: BulletHellLifetimeScope
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5981310290753007484
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178457658457192466}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5379856571818504701}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2765331894517235458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1178457658457192466}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 372837d0516c48745a63068fbf881bb5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  parentReference:
+    TypeName: 
+  autoRun: 1
   autoInjectGameObjects:
   - {fileID: 0}
-  portalPrefab: {fileID: 0}
+  - {fileID: 0}
+  trailPool: {fileID: 0}
+  player: {fileID: 0}

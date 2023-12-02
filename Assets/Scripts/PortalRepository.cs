@@ -9,7 +9,6 @@ using System.Linq;
 public class PortalRepository
 {
     private readonly GameObject portalPrefab;
-    private readonly IObjectResolver container;
     private readonly LifetimeScope scope;
 
     private Dictionary<Guid, Portal> portals;
@@ -20,7 +19,6 @@ public class PortalRepository
         Debug.Assert(scope != null);
 
         this.portalPrefab = portalPrefab;
-        this.container = scope.Container;
         this.scope = scope;
 
         this.portals = new Dictionary<Guid, Portal>();

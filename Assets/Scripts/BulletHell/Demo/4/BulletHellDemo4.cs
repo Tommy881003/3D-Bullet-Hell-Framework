@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BulletHell3D;
 using DG.Tweening;
+using VContainer;
 
 public class BulletHellDemo4 : MonoBehaviour
 {
@@ -21,24 +22,18 @@ public class BulletHellDemo4 : MonoBehaviour
     [SerializeField]
     private float speed;
 
+    [Inject]
     private Player player;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        player = DependencyContainer.GetDependency<Player>() as Player;
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha4))
+        if (Input.GetKeyDown(KeyCode.Alpha4))
             StartCoroutine(Showcase(transform.position, (player.transform.position - transform.position).normalized));
     }
 
     IEnumerator Showcase(Vector3 postion, Vector3 forward)
     {
-        for(int i = 0; i < spawnPatternCount; i++)
+        for (int i = 0; i < spawnPatternCount; i++)
         {
             StartCoroutine(SpawnPattern(postion, forward, i));
             yield return new WaitForSeconds(spawnPatternGap);
@@ -48,7 +43,7 @@ public class BulletHellDemo4 : MonoBehaviour
     IEnumerator SpawnPattern(Vector3 postion, Vector3 forward, int index)
     {
         GameObject go = new GameObject();
-        
+
         float angle = index * rotatePerPattern * Mathf.Deg2Rad;
         float scale = index * scalePerPattern;
 
@@ -60,7 +55,7 @@ public class BulletHellDemo4 : MonoBehaviour
 
         go.transform.DOScale(Vector3.one * scale, patternExpandTime).SetEase(Ease.Linear);
         yield return new WaitForSeconds(patternExpandTime);
-        while(go != null)
+        while (go != null)
         {
             go.transform.position += forward * speed * Time.deltaTime;
             yield return null;

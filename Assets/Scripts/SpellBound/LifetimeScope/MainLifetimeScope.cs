@@ -14,8 +14,6 @@ public class MainLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterInstance(this.portalPrefab);
-        builder.Register<PortalRepository>(Lifetime.Singleton);
         builder.RegisterInstance(this.gameConfig);
         builder.RegisterInstance(this.gameConfig.CollisionGroups);
 

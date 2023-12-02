@@ -4,6 +4,8 @@ using UnityEngine;
 using BulletHell3D;
 using VContainer;
 using MessagePipe;
+using System;
+using Cysharp.Threading.Tasks.Triggers;
 
 public class BulletHellDemo1 : MonoBehaviour
 {
@@ -39,15 +41,18 @@ public class BulletHellDemo1 : MonoBehaviour
 
     private float traceTimer = 0;
 
-    private Player player;
+    private BHTracerUpdater tracerUpdater;
 
     [Inject]
+    private Player player;
+    [Inject]
     private ISubscriber<System.Guid, CollisionEvent> subscriber;
+    [Inject]
+    private Func<GameObject, BHTracerUpdater> createUpdater;
 
-    // Start is called before the first frame update
     void Start()
     {
-        player = DependencyContainer.GetDependency<Player>() as Player;
+        this.tracerUpdater = this.createUpdater(gameObject);
         Vector3 toPlayer = player.transform.position - transform.position;
         Vector3 newFoward = new Vector3(toPlayer.x, 0, toPlayer.z);
         transform.rotation = Quaternion.LookRotation(newFoward, Vector3.up);
@@ -93,9 +98,11 @@ public class BulletHellDemo1 : MonoBehaviour
                 timer += burstGap;
                 angle = (angle + burstRotate) % 360;
             }
+
             if (traceTimer <= 0)
             {
-                BHTracerUpdater.instance.AddPattern(tracePattern, transform.position, transform.forward, 0, traceSpeed, traceDelay);
+                Debug.Assert(this.tracerUpdater != null);
+                this.tracerUpdater.AddPattern(tracePattern, transform.position, transform.forward, 0, traceSpeed, traceDelay);
                 traceTimer += traceBurstGap;
             }
 

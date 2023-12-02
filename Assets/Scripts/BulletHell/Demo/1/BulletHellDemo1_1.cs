@@ -7,13 +7,14 @@ public class BulletHellDemo1_1 : BHCustomUpdater
 {
     [SerializeField]
     private float speed;
-    [SerializeField,Range(0,1)]
+    [SerializeField, Range(0, 1)]
     private float rotateStrenth;
+
     protected override void UpdateCustom(float deltaTime)
     {
         int length = bullets.Count;
 
-        for(int i = 0; i < length; i++)
+        for (int i = 0; i < length; i++)
         {
             Vector3 position = bullets[i].position;
             bullets[i].SetPosition(position + forwards[i] * speed * deltaTime);

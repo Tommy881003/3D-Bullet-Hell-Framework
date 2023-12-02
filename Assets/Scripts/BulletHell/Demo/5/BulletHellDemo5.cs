@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using BulletHell3D;
 using DG.Tweening;
+using VContainer;
 
 public class BulletHellDemo5 : MonoBehaviour
 {
@@ -25,11 +26,12 @@ public class BulletHellDemo5 : MonoBehaviour
     [SerializeField]
     private float tracerDelay;
 
+    [Inject]
+    private System.Func<GameObject, BulletHellDemo5_1> createDemo;
 
-    // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Alpha5))
+        if (Input.GetKeyDown(KeyCode.Alpha5))
             StartCoroutine(Showcase());
     }
 
@@ -39,8 +41,8 @@ public class BulletHellDemo5 : MonoBehaviour
         go.transform.position = transform.position;
         go.transform.rotation = Random.rotation;
         go.transform.localScale = Vector3.zero;
-        
-        BulletHellDemo5_1 demoUpdater = go.AddComponent<BulletHellDemo5_1>();
+
+        BulletHellDemo5_1 demoUpdater = this.createDemo(go);
         demoUpdater.SetPattern(pattern);
 
         go.transform.DOScale(Vector3.one * scale, patternExpandTime).SetEase(patternExpandEase);
@@ -48,7 +50,7 @@ public class BulletHellDemo5 : MonoBehaviour
 
         float timer = 0;
 
-        while(go != null)
+        while (go != null)
         {
             demoUpdater.SpawnRandom(decomposePerTick, tracerObj, tracerSpeed, tracerDelay);
             timer += Time.fixedDeltaTime;

@@ -6,9 +6,6 @@ namespace BulletHell3D
 {
     public class BHTrailPool : MonoBehaviour
     {
-        private static BHTrailPool _instance = null;
-        public static BHTrailPool instance { get { return _instance; } }
-
         private const int maxTrailCount = 1000;
         private Queue<TrailRenderer> trQueue = new Queue<TrailRenderer>();
 
@@ -18,21 +15,9 @@ namespace BulletHell3D
 
         public int stockCount { get { return trQueue.Count; } }
 
-        void Awake() 
-        {
-            if(_instance == null)
-                _instance = this;
-            else
-            {
-                Destroy(gameObject);
-                return;
-            } 
-        }
-
-        // Start is called before the first frame update
         void Start()
         {
-            for(int i = 0; i < maxTrailCount; i++)
+            for (int i = 0; i < maxTrailCount; i++)
             {
                 GameObject go = Instantiate(trPreset);
                 go.transform.SetParent(transform);
@@ -43,7 +28,7 @@ namespace BulletHell3D
 
         public TrailRenderer RequestTrail()
         {
-            if(trQueue.Count == 0)
+            if (trQueue.Count == 0)
                 return null;
             TrailRenderer tr = trQueue.Dequeue();
             tr.gameObject.SetActive(true);
